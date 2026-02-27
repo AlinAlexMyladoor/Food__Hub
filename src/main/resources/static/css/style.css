@@ -1,0 +1,117 @@
+/* Color Palette */
+:root {
+    --bg-deep: #0B0B0C;
+    --card-bg: #1A1A1D;
+    --accent-gradient: linear-gradient(135deg, #FF8C00 0%, #FF2D55 100%);
+    --text-primary: #FFFFFF;
+    --text-secondary: #A0A0A0;
+    --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+    background-color: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+}
+
+/* 1. Header & Search Area */
+.header-section {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-bar {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 10px 15px;
+    color: white;
+    width: 80%;
+}
+
+/* 2. Featured Card (The "Juicy Steak" Banner) */
+.featured-banner {
+    background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('/images/steak.jpg');
+    background-size: cover;
+    border-radius: 24px;
+    padding: 25px;
+    margin: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.price-tag {
+    background: var(--accent-gradient);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* 3. Category Pills */
+.category-pill {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    padding: 8px 20px;
+    border-radius: 12px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.category-pill.active {
+    background: var(--accent-gradient);
+    border: none;
+}
+
+/* 4. Food Cards (The "Popular Now" Grid) */
+.food-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    border: 1px solid var(--glass-border);
+    padding: 15px;
+    text-align: left;
+    transition: transform 0.3s ease;
+}
+
+.food-card:hover {
+    transform: translateY(-5px);
+}
+
+.food-img {
+    width: 100%;
+    border-radius: 15px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+.rating-stars {
+    color: #FFD700;
+    font-size: 0.8rem;
+}
+
+/* 5. Bottom Navigation Bar */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: rgba(26, 26, 29, 0.95);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-around;
+    padding: 15px 0;
+    border-top: 1px solid var(--glass-border);
+}
+
+.nav-item {
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+}
+
+.nav-item.active {
+    color: var(--accent-gradient); /* Note: Use a single color or text-fill-color for icons */
+    color: #FF2D55;
+}
