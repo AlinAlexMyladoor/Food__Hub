@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>FoodHub — Demo</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-wrap">
+    <header class="header-section">
+      <button class="icon-btn"><i class="fas fa-arrow-left"></i></button>
+      <div class="search-area">
+        <input class="search-bar" placeholder="Search dishes, restaurants..." aria-label="Search">
+      </div>
+      <div class="avatar"><img src="https://i.pravatar.cc/40" alt="avatar"></div>
+    </header>
+
+    <main class="mobile-mock">
+      <!-- left card - menu -->
+      <section class="app-screen screen-left">
+        <div class="featured-banner">
+          <div class="banner-left">
+            <h3>Juicy And<br>Savory Steak</h3>
+            <p class="muted">Only for</p>
+            <div class="price-tag">$15.99</div>
+          </div>
+          <img src="/mnt/data/WhatsApp Image 2026-02-26 at 9.10.46 PM.jpeg" class="banner-food" alt="steak">
+        </div>
+
+        <div class="pills">
+          <button class="category-pill active">Breakfast</button>
+          <button class="category-pill">Lunch</button>
+          <button class="category-pill">Dinner</button>
+        </div>
+
+        <h4 class="section-title">Popular Now</h4>
+        <div class="grid-2">
+          <article class="food-card">
+            <img src="/mnt/data/WhatsApp Image 2026-02-26 at 9.10.46 PM.jpeg" class="food-img" alt="">
+            <div class="food-meta">
+              <div class="food-title">Egg & Bacon</div>
+              <div class="row small muted"><span class="rating-stars">★★★★☆</span> • $9</div>
+            </div>
+          </article>
+
+          <article class="food-card">
+            <img src="/mnt/data/WhatsApp Image 2026-02-26 at 9.10.46 PM.jpeg" class="food-img" alt="">
+            <div class="food-meta">
+              <div class="food-title">Berry Pancake</div>
+              <div class="row small muted"><span class="rating-stars">★★★★★</span> • $12</div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- center card - detail -->
+      <section class="app-screen screen-center">
+        <div class="product-card">
+          <img src="/mnt/data/WhatsApp Image 2026-02-26 at 9.10.46 PM.jpeg" class="product-photo" alt="">
+          <div class="product-body">
+            <h3>Lorem Ipsum Dolor Sit Amet</h3>
+            <div class="price">$12.59</div>
+            <p class="muted">A short tasty description goes here — made with fresh ingredients and love.</p>
+            <div class="rating-stars">★★★★★</div>
+            <div class="foot">
+              <div class="qty">
+                <button class="small">-</button><span class="muted">1</span><button class="small">+</button>
+              </div>
+              <button class="btn-order">Order Now</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- right card - gallery -->
+      <section class="app-screen screen-right">
+        <h4 class="section-title">Recommended</h4>
+        <div class="grid-list">
+          <div class="tile">
+            <img src="/mnt/data/WhatsApp Image 2026-02-26 at 9.10.46 PM.jpeg" alt="">
+            <div class="tile-meta"><strong>Grilled Fish</strong><span class="small muted">$10</span></div>
+          </div>
+          <div class="tile">
+            <img src="/mnt/data/WhatsApp Image 2026-02-26 at 9.10.46 PM.jpeg" alt="">
+            <div class="tile-meta"><strong>Veg Bowl</strong><span class="small muted">$8</span></div>
+          </div>
+          <div class="tile">
+            <img src="/mnt/data/WhatsApp Image 2026-02-26 at 9.10.46 PM.jpeg" alt="">
+            <div class="tile-meta"><strong>Mixed Grill</strong><span class="small muted">$14</span></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Bottom navigation">
+      <button class="nav-item active"><i class="fas fa-home"></i></button>
+      <button class="nav-item"><i class="fas fa-shopping-cart"></i></button>
+      <button class="nav-item"><i class="fas fa-receipt"></i></button>
+      <button class="nav-item"><i class="fas fa-user"></i></button>
+    </nav>
+  </div>
+</body>
+</html>

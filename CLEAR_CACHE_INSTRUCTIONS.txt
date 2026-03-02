@@ -1,0 +1,49 @@
+============================================
+HOW TO SEE THE NEW RED & WHITE THEME
+============================================
+
+The CSS has been completely updated to RED & WHITE theme!
+
+If you're still seeing the old BLACK & ORANGE theme, it's because 
+your browser has cached the old CSS file.
+
+SOLUTION - Clear Browser Cache:
+--------------------------------
+
+**Option 1: Hard Refresh (RECOMMENDED)**
+   - Chrome/Edge: Press Ctrl + Shift + R (or Cmd + Shift + R on Mac)
+   - Firefox: Press Ctrl + F5 (or Cmd + Shift + R on Mac)
+   - Safari: Press Cmd + Option + R
+
+**Option 2: Clear Cache in Browser Settings**
+   - Chrome: Settings > Privacy > Clear browsing data > Cached images and files
+   - Firefox: Settings > Privacy > Clear Data > Cached Web Content
+   - Edge: Settings > Privacy > Clear browsing data > Cached images and files
+
+**Option 3: Open in Private/Incognito Window**
+   - This will load fresh CSS without any cache
+   - Chrome: Ctrl + Shift + N
+   - Firefox: Ctrl + Shift + P
+   - Edge: Ctrl + Shift + N
+
+**Option 4: Add Cache-Busting Parameter**
+   - Open: http://localhost:8080/?v=2
+   - This forces a fresh load of all resources
+
+============================================
+WHAT YOU SHOULD SEE:
+============================================
+
+✓ WHITE background (instead of black)
+✓ RED accent colors (instead of orange)
+✓ White cards with red borders on hover
+✓ Red gradient on buttons
+✓ Light red particles floating
+✓ Red logo text
+✓ White login form with red accents
+
+============================================
+
+The application is running at: http://localhost:8080
+
+Try accessing it with one of the methods above!

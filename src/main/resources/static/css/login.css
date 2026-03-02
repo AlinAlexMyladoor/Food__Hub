@@ -1,87 +1,479 @@
+/* ===== PREMIUM WHITE + RED THEME - v2.0 ===== */
+
 :root {
-    --bg-color: #0b0b0b;
-    --card-bg: #161616;
-    --accent: #ff9800;
-    --text-main: #ffffff;
-    --text-muted: #888;
+    --bg-main: #ffffff !important;
+    --bg-soft: #fef5f6 !important;
+    --card-bg: #ffffff !important;
+    --accent-primary: #d90429 !important;   /* Strong Red */
+    --accent-dark: #a6031e !important;
+    --accent-light: #ffccd5 !important;
+    --accent-gradient: linear-gradient(135deg, #d90429 0%, #ff4d6d 100%) !important;
+    --text-main: #1a1a1a !important;
+    --text-muted: #777777 !important;
+    --border-light: #e8e8e8 !important;
+    --shadow-soft: 0 8px 25px rgba(217, 4, 41, 0.08) !important;
+    --shadow-strong: 0 15px 40px rgba(217, 4, 41, 0.18) !important;
 }
 
-body.dark-theme {
-    background-color: var(--bg-color);
-    color: var(--text-main);
+/* ===== BODY ===== */
+
+body {
+    background: #ffffff;
+    background-image: radial-gradient(circle at 80% 20%, #fff5f7 0%, #ffffff 50%);
+    color: #1a1a1a;
     min-height: 100vh;
     display: flex;
     align-items: center;
-    background-image: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0b0b0b 100%);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    margin: 0;
+    opacity: 1;
+    overflow-x: hidden;
+}
+
+/* Subtle background glow */
+body::before {
+    content: "";
+    position: fixed;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(217,4,41,0.06), transparent 70%);
+    top: -200px;
+    right: -200px;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ===== PARTICLES (light red only) ===== */
+
+.particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, rgba(217, 4, 41, 0.4), rgba(217, 4, 41, 0.05)) !important;
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: float 20s infinite ease-in-out;
+}
+
+.particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 15s; }
+.particle:nth-child(2) { left: 20%; animation-delay: 2s; animation-duration: 18s; }
+.particle:nth-child(3) { left: 35%; animation-delay: 4s; animation-duration: 20s; }
+.particle:nth-child(4) { left: 50%; animation-delay: 1s; animation-duration: 22s; }
+.particle:nth-child(5) { left: 65%; animation-delay: 3s; animation-duration: 17s; }
+.particle:nth-child(6) { left: 75%; animation-delay: 5s; animation-duration: 19s; }
+.particle:nth-child(7) { left: 85%; animation-delay: 2.5s; animation-duration: 21s; }
+.particle:nth-child(8) { left: 90%; animation-delay: 4.5s; animation-duration: 16s; }
+
+@keyframes float {
+    0%, 100% { 
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.4;
+    }
+    90% {
+        opacity: 0.4;
+    }
+    50% {
+        transform: translateY(-20vh) scale(1.5);
+        opacity: 0.7;
+    }
+}
+
+/* ===== LOGO ===== */
+
+.logo-wrapper {
+    perspective: 1000px;
 }
 
 .logo-text {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--accent);
-    letter-spacing: -2px;
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: -3px;
+    margin-bottom: 2rem;
+    display: inline-block;
 }
 
-/* Role Cards */
-.role-card {
-    background: var(--card-bg);
-    padding: 40px 20px;
+.logo-letter {
+    display: inline-block;
+    color: #d90429 !important;
+    background: linear-gradient(135deg, #d90429 0%, #ff4d6d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    animation: wave 2s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 0.1s);
+    font-weight: 900;
+}
+
+.logo-icon {
+    display: inline-block;
+    font-size: 2.5rem;
+    animation: bounce 2s ease-in-out infinite;
+    filter: drop-shadow(0 5px 15px rgba(217, 4, 41, 0.3));
+}
+
+@keyframes wave {
+    0%, 100% { transform: translateY(0) rotateX(0); }
+    50% { transform: translateY(-10px) rotateX(10deg); }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(10deg); }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s ease 0.3s both;
+}
+
+/* ===== ROLE CARDS ===== */
+
+.role-card-col {
+    animation: fadeInUp 0.6s ease backwards;
+    animation-delay: var(--delay);
+}
+
+.role-card,
+div.role-card,
+.role-card-col .role-card {
+    background: linear-gradient(135deg, #d90429 0%, #ff4d6d 100%) !important;
+    padding: 40px 24px;
     border-radius: 20px;
-    border: 1px solid #222;
-    transition: all 0.3s ease;
+    border: 2px solid #ff4d6d !important;
+    box-shadow: 0 8px 25px rgba(217, 4, 41, 0.3) !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     cursor: pointer;
-    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.role-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(135deg, rgba(217, 4, 41, 0.08), rgba(255, 77, 109, 0.08));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    transform: rotate(45deg);
+    z-index: 0;
+}
+
+.role-card:hover::before {
+    opacity: 1;
 }
 
 .role-card:hover {
-    transform: translateY(-10px);
-    border-color: var(--accent);
-    box-shadow: 0 10px 30px rgba(255, 152, 0, 0.2);
+    transform: translateY(-12px) scale(1.02);
+    border-color: #d90429 !important;
+    box-shadow: 0 20px 40px rgba(217, 4, 41, 0.2) !important;
+}
+
+.role-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.icon-wrapper {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
+    background: #ffffff !important;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.role-card:hover .icon-wrapper {
+    transform: scale(1.1) rotateY(360deg);
+    box-shadow: 0 10px 30px rgba(217, 4, 41, 0.4);
 }
 
 .role-card i {
-    font-size: 3rem;
-    color: var(--accent);
-    margin-bottom: 15px;
+    font-size: 2.4rem;
+    color: #d90429 !important;
+    transition: transform 0.3s ease;
 }
 
-.role-card h3 {
+.role-card h4 {
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
     font-size: 1.25rem;
-    font-weight: 600;
+    color: #ffffff !important;
 }
 
 .role-card p {
-    color: var(--text-muted);
-    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9) !important;
 }
 
-/* Login Box */
+.card-shine {
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 50px;
+    height: 200%;
+    background: linear-gradient(90deg, transparent, rgba(217, 4, 41, 0.15), transparent);
+    transform: rotate(45deg);
+    transition: 0.6s;
+}
+
+.role-card:hover .card-shine {
+    left: 200%;
+}
+
+/* Ripple Effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(217, 4, 41, 0.3);
+    transform: scale(0);
+    animation: ripple-effect 0.6s ease-out;
+    pointer-events: none;
+}
+
+@keyframes ripple-effect {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* ===== LOGIN BOX ===== */
+
 .login-box {
-    max-width: 400px;
+    max-width: 450px;
     margin: 0 auto;
-    background: var(--card-bg);
-    padding: 40px;
+    background: #ffffff !important;
     border-radius: 24px;
-    border: 1px solid #333;
+    border: 2px solid #f0f0f0 !important;
+    box-shadow: 0 15px 40px rgba(217, 4, 41, 0.15) !important;
+    padding: 40px;
+    position: relative;
+    backdrop-filter: blur(10px);
 }
 
-.custom-input {
-    background: #222;
-    border: 1px solid #444;
-    color: white;
-    padding: 12px;
+.login-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(135deg, #d90429 0%, #ff4d6d 100%) !important;
+    border-radius: 24px 24px 0 0;
 }
 
-.custom-input:focus {
-    background: #2a2a2a;
-    border-color: var(--accent);
-    color: white;
-    box-shadow: none;
+.form-title {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 800;
+    font-size: 1.5rem;
+    text-align: center;
+    color: #d90429 !important;
+    margin-bottom: 25px;
+}
+
+/* ===== BACK BUTTON ===== */
+
+.btn-back {
+    background: #ffffff !important;
+    border: 1px solid #e8e8e8 !important;
+    color: #d90429 !important;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 10px 20px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.btn-back:hover {
+    background: #fff5f6 !important;
+    border-color: #d90429 !important;
+    transform: translateX(-5px);
+}
+
+/* ===== INPUTS ===== */
+
+.input-group-animated {
+    position: relative;
 }
 
 .form-label {
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    color: #777777 !important;
+    font-weight: 600;
+}
+
+.custom-input {
+    background: #ffffff !important;
+    border: 1.5px solid #e8e8e8 !important;
+    color: #1a1a1a !important;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.custom-input::placeholder {
+    color: #aaaaaa;
+}
+
+.custom-input:focus {
+    background: #ffffff !important;
+    border-color: #d90429 !important;
+    box-shadow: 0 0 0 4px rgba(217, 4, 41, 0.1) !important;
+    color: #1a1a1a !important;
+    outline: none;
+    transform: translateY(-2px);
+}
+
+.input-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, #d90429 0%, #ff4d6d 100%);
+    transition: width 0.4s ease;
+}
+
+.input-group-animated:focus-within .input-line {
+    width: 100%;
+}
+
+/* ===== SUBMIT BUTTON ===== */
+
+.btn-submit {
+    background: linear-gradient(135deg, #d90429 0%, #ff4d6d 100%) !important;
+    color: #ffffff !important;
+    border: none;
+    font-weight: 700;
+    padding: 14px;
+    border-radius: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-submit::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-submit:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-submit:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 30px rgba(217, 4, 41, 0.4) !important;
+}
+
+.btn-submit span,
+.btn-submit i {
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== ALERT ===== */
+
+.alert-animated {
+    background: #fff0f2 !important;
+    border: 1px solid #ffccd5 !important;
+    color: #d90429 !important;
+    border-radius: 12px;
+    font-weight: 600;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* ===== TEXT ===== */
+
+.text-muted {
+    color: #777777 !important;
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+    .logo-text {
+        font-size: 2.8rem;
+    }
+
+    .role-card {
+        padding: 30px 20px;
+    }
+
+    .login-box {
+        padding: 30px 25px;
+        border-radius: 20px;
+    }
 }

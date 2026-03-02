@@ -1,34 +1,333 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <title>Waiter Dashboard</title>
 </head>
-<body>
-<body class="dark-theme">
-    <div class="top-nav-actions">
-        <a href="/" class="logout-link">
-            <i class="fas fa-sign-out-alt"></i> Exit System
-        </a>
-    </div>
-    <div class="container mt-5">
-        <h2>Waiter Panel</h2>
-        <div class="row mt-4">
-            <div class="col-md-3">
-                <div class="card text-center p-4">
-                    <h3>Table 1</h3>
-                    <span class="badge bg-success mb-2">Occupied</span>
-                    <button class="btn btn-outline-warning btn-sm">Served</button>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card text-center p-4">
-                    <h3>Table 2</h3>
-                    <span class="badge bg-secondary mb-2">Empty</span>
-                </div>
+<body class="waiter-body">
+    
+    <!-- Waiter Header -->
+    <header class="waiter-header">
+        <div class="header-left">
+            <div class="logo-badge">
+                <i class="fas fa-concierge-bell"></i>
+                <span>Waiter Panel</span>
             </div>
         </div>
-    </div>
+        <div class="header-center">
+            <h2>Table Management</h2>
+        </div>
+        <div class="header-right">
+            <div class="stats-mini">
+                <div class="stat-mini">
+                    <span class="stat-value">8</span>
+                    <span class="stat-label">Occupied</span>
+                </div>
+                <div class="stat-mini">
+                    <span class="stat-value">4</span>
+                    <span class="stat-label">Available</span>
+                </div>
+            </div>
+            <a href="/" class="btn-logout-inline">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Floor Plan -->
+    <main class="waiter-container">
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" data-filter="all">
+                <i class="fas fa-th"></i>
+                <span>All Tables</span>
+            </button>
+            <button class="filter-tab" data-filter="occupied">
+                <i class="fas fa-users"></i>
+                <span>Occupied</span>
+            </button>
+            <button class="filter-tab" data-filter="available">
+                <i class="fas fa-check-circle"></i>
+                <span>Available</span>
+            </button>
+            <button class="filter-tab" data-filter="reserved">
+                <i class="fas fa-bookmark"></i>
+                <span>Reserved</span>
+            </button>
+        </div>
+
+        <!-- Tables Grid -->
+        <div class="tables-grid">
+            <!-- Table 1 - Occupied -->
+            <article class="table-card table-occupied" data-status="occupied" style="--delay: 0.1s">
+                <div class="table-visual">
+                    <div class="table-icon">
+                        <i class="fas fa-chair"></i>
+                    </div>
+                    <div class="table-seats">4</div>
+                </div>
+                <div class="table-info">
+                    <h3>Table 01</h3>
+                    <div class="table-status status-occupied">
+                        <i class="fas fa-circle"></i>
+                        <span>Occupied</span>
+                    </div>
+                    <div class="table-details">
+                        <span class="detail-item">
+                            <i class="fas fa-user"></i> John Doe
+                        </span>
+                        <span class="detail-item">
+                            <i class="far fa-clock"></i> 45 min
+                        </span>
+                    </div>
+                    <div class="table-order-info">
+                        <span class="order-count">3 items</span>
+                        <span class="order-amount">$42.50</span>
+                    </div>
+                </div>
+                <div class="table-actions">
+                    <button class="btn-table-action btn-view">
+                        <i class="fas fa-eye"></i>
+                        View Order
+                    </button>
+                    <button class="btn-table-action btn-bill">
+                        <i class="fas fa-receipt"></i>
+                        Bill
+                    </button>
+                    <button class="btn-table-action btn-clear">
+                        <i class="fas fa-check"></i>
+                        Clear
+                    </button>
+                </div>
+            </article>
+
+            <!-- Table 2 - Available -->
+            <article class="table-card table-available" data-status="available" style="--delay: 0.2s">
+                <div class="table-visual">
+                    <div class="table-icon">
+                        <i class="fas fa-chair"></i>
+                    </div>
+                    <div class="table-seats">2</div>
+                </div>
+                <div class="table-info">
+                    <h3>Table 02</h3>
+                    <div class="table-status status-available">
+                        <i class="fas fa-circle"></i>
+                        <span>Available</span>
+                    </div>
+                    <div class="table-details">
+                        <span class="detail-item">
+                            <i class="fas fa-check-circle"></i> Ready
+                        </span>
+                    </div>
+                </div>
+                <div class="table-actions">
+                    <button class="btn-table-action btn-assign">
+                        <i class="fas fa-plus-circle"></i>
+                        Assign Guest
+                    </button>
+                </div>
+            </article>
+
+            <!-- Table 3 - Occupied -->
+            <article class="table-card table-occupied" data-status="occupied" style="--delay: 0.3s">
+                <div class="table-visual">
+                    <div class="table-icon">
+                        <i class="fas fa-chair"></i>
+                    </div>
+                    <div class="table-seats">6</div>
+                </div>
+                <div class="table-info">
+                    <h3>Table 03</h3>
+                    <div class="table-status status-occupied">
+                        <i class="fas fa-circle"></i>
+                        <span>Occupied</span>
+                    </div>
+                    <div class="table-details">
+                        <span class="detail-item">
+                            <i class="fas fa-user"></i> Smith Family
+                        </span>
+                        <span class="detail-item">
+                            <i class="far fa-clock"></i> 20 min
+                        </span>
+                    </div>
+                    <div class="table-order-info">
+                        <span class="order-count">6 items</span>
+                        <span class="order-amount">$89.00</span>
+                    </div>
+                </div>
+                <div class="table-actions">
+                    <button class="btn-table-action btn-view">
+                        <i class="fas fa-eye"></i>
+                        View Order
+                    </button>
+                    <button class="btn-table-action btn-bill">
+                        <i class="fas fa-receipt"></i>
+                        Bill
+                    </button>
+                    <button class="btn-table-action btn-clear">
+                        <i class="fas fa-check"></i>
+                        Clear
+                    </button>
+                </div>
+            </article>
+
+            <!-- Table 4 - Reserved -->
+            <article class="table-card table-reserved" data-status="reserved" style="--delay: 0.4s">
+                <div class="table-visual">
+                    <div class="table-icon">
+                        <i class="fas fa-chair"></i>
+                    </div>
+                    <div class="table-seats">4</div>
+                </div>
+                <div class="table-info">
+                    <h3>Table 04</h3>
+                    <div class="table-status status-reserved">
+                        <i class="fas fa-circle"></i>
+                        <span>Reserved</span>
+                    </div>
+                    <div class="table-details">
+                        <span class="detail-item">
+                            <i class="fas fa-user"></i> Emily Johnson
+                        </span>
+                        <span class="detail-item">
+                            <i class="far fa-clock"></i> 7:30 PM
+                        </span>
+                    </div>
+                </div>
+                <div class="table-actions">
+                    <button class="btn-table-action btn-confirm">
+                        <i class="fas fa-check"></i>
+                        Confirm Arrival
+                    </button>
+                    <button class="btn-table-action btn-cancel">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </div>
+            </article>
+
+            <!-- Table 5 - Available -->
+            <article class="table-card table-available" data-status="available" style="--delay: 0.5s">
+                <div class="table-visual">
+                    <div class="table-icon">
+                        <i class="fas fa-chair"></i>
+                    </div>
+                    <div class="table-seats">2</div>
+                </div>
+                <div class="table-info">
+                    <h3>Table 05</h3>
+                    <div class="table-status status-available">
+                        <i class="fas fa-circle"></i>
+                        <span>Available</span>
+                    </div>
+                    <div class="table-details">
+                        <span class="detail-item">
+                            <i class="fas fa-check-circle"></i> Ready
+                        </span>
+                    </div>
+                </div>
+                <div class="table-actions">
+                    <button class="btn-table-action btn-assign">
+                        <i class="fas fa-plus-circle"></i>
+                        Assign Guest
+                    </button>
+                </div>
+            </article>
+
+            <!-- Table 6 - Occupied -->
+            <article class="table-card table-occupied" data-status="occupied" style="--delay: 0.6s">
+                <div class="table-visual">
+                    <div class="table-icon">
+                        <i class="fas fa-chair"></i>
+                    </div>
+                    <div class="table-seats">4</div>
+                </div>
+                <div class="table-info">
+                    <h3>Table 06</h3>
+                    <div class="table-status status-occupied">
+                        <i class="fas fa-circle"></i>
+                        <span>Occupied</span>
+                    </div>
+                    <div class="table-details">
+                        <span class="detail-item">
+                            <i class="fas fa-user"></i> Mike Wilson
+                        </span>
+                        <span class="detail-item">
+                            <i class="far fa-clock"></i> 15 min
+                        </span>
+                    </div>
+                    <div class="table-order-info">
+                        <span class="order-count">2 items</span>
+                        <span class="order-amount">$28.00</span>
+                    </div>
+                </div>
+                <div class="table-actions">
+                    <button class="btn-table-action btn-view">
+                        <i class="fas fa-eye"></i>
+                        View Order
+                    </button>
+                    <button class="btn-table-action btn-bill">
+                        <i class="fas fa-receipt"></i>
+                        Bill
+                    </button>
+                    <button class="btn-table-action btn-clear">
+                        <i class="fas fa-check"></i>
+                        Clear
+                    </button>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <script>
+        // Filter functionality
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.getAttribute('data-filter');
+                const tables = document.querySelectorAll('.table-card');
+                
+                tables.forEach(table => {
+                    if (filter === 'all' || table.getAttribute('data-status') === filter) {
+                        table.style.display = 'flex';
+                        table.style.animation = 'fadeInScale 0.5s ease forwards';
+                    } else {
+                        table.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Action buttons
+        document.querySelectorAll('.btn-clear').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const card = this.closest('.table-card');
+                card.classList.remove('table-occupied');
+                card.classList.add('table-available');
+                card.setAttribute('data-status', 'available');
+                showNotification('Table cleared successfully!');
+            });
+        });
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification-toast';
+            notification.innerHTML = `<i class="fas fa-check-circle me-2"></i>${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
