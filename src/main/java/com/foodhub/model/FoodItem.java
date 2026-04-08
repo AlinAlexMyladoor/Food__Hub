@@ -14,4 +14,7 @@ public class FoodItem {
     private String category; // Starter, Main, etc.
     private double price;
     private String imageUrl;
+    
+    private boolean isVeg = true;
+    private boolean isAvailable = true;
 }

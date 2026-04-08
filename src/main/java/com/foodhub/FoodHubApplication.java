@@ -16,7 +16,7 @@ public class FoodHubApplication {
     }
 
     @Bean
-CommandLineRunner initDatabase(FoodRepository repository) {
+CommandLineRunner initFoodDatabase(FoodRepository repository) {
     return args -> {
         FoodItem f1 = new FoodItem();
         f1.setName("Margherita Pizza");

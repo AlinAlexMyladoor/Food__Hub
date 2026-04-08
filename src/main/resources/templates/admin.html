@@ -36,14 +36,10 @@
                 <i class="fas fa-users"></i>
                 <span>Staff Management</span>
             </a>
-            <a href="#analytics" class="nav-link">
-                <i class="fas fa-chart-pie"></i>
-                <span>Analytics</span>
-            </a>
         </nav>
         
         <div class="sidebar-footer">
-            <a href="/" class="btn-logout">
+            <a th:href="@{/logout}" class="btn-logout">
                 <i class="fas fa-sign-out-alt me-2"></i>
                 Logout
             </a>
@@ -52,107 +48,130 @@
 
     <!-- Main Content Area -->
     <div class="main-wrapper">
-        <!-- Top Navigation Bar -->
         <header class="top-navbar">
             <div class="navbar-left">
-                <button class="menu-toggle"><i class="fas fa-bars"></i></button>
                 <h2 class="page-title">Admin Dashboard</h2>
             </div>
             <div class="navbar-right">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search anything...">
-                </div>
-                <button class="icon-btn notification-btn">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge-dot"></span>
-                </button>
                 <div class="user-profile">
                     <img src="https://i.pravatar.cc/40" alt="Admin">
-                    <span>Admin</span>
                 </div>
             </div>
         </header>
 
-        <!-- Dashboard Content -->
         <main class="dashboard-content">
             <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card stat-gradient-1" style="--delay: 0.1s">
-                    <div class="stat-icon">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
+            <div class="stats-grid" id="dashboard">
+                <div class="stat-card stat-gradient-1">
+                    <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
                     <div class="stat-info">
                         <h4>Total Sales</h4>
-                        <h2 class="counter" data-target="1240">$0</h2>
-                        <p class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> +12.5%
-                        </p>
+                        <h2 class="counter text-white" th:text="'₹' + ${totalSales}">₹0</h2>
                     </div>
-                    <div class="stat-bg-icon"><i class="fas fa-dollar-sign"></i></div>
                 </div>
-
-                <div class="stat-card stat-gradient-2" style="--delay: 0.2s">
-                    <div class="stat-icon">
-                        <i class="fas fa-shopping-bag"></i>
-                    </div>
+                <div class="stat-card stat-gradient-2">
+                    <div class="stat-icon"><i class="fas fa-shopping-bag"></i></div>
                     <div class="stat-info">
-                        <h4>Today's Orders</h4>
-                        <h2 class="counter" data-target="87">0</h2>
-                        <p class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> +8.2%
-                        </p>
+                        <h4>Total Orders</h4>
+                        <h2 class="counter text-white" th:text="${totalOrders}">0</h2>
                     </div>
-                    <div class="stat-bg-icon"><i class="fas fa-shopping-bag"></i></div>
                 </div>
-
-                <div class="stat-card stat-gradient-3" style="--delay: 0.3s">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
+                <div class="stat-card stat-gradient-3">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
                     <div class="stat-info">
                         <h4>Active Users</h4>
-                        <h2 class="counter" data-target="342">0</h2>
-                        <p class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> +5.7%
-                        </p>
+                        <h2 class="counter text-white" th:text="${totalUsers}">0</h2>
                     </div>
-                    <div class="stat-bg-icon"><i class="fas fa-users"></i></div>
                 </div>
+            </div>
 
-                <div class="stat-card stat-gradient-4" style="--delay: 0.4s">
-                    <div class="stat-icon">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h4>Average Rating</h4>
-                        <h2>4.8<span class="small-text">/5.0</span></h2>
-                        <p class="stat-change positive">
-                            <i class="fas fa-arrow-up"></i> +0.3
-                        </p>
-                    </div>
-                    <div class="stat-bg-icon"><i class="fas fa-star"></i></div>
+            <!-- Order History -->
+            <div class="content-card mt-4" id="orders">
+                <div class="card-header-flex">
+                    <h3><i class="fas fa-history me-2"></i>Order History & Bills</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Table</th>
+                                <th>Time</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="o : ${allOrders}">
+                                <td th:text="'#' + ${o.id}"></td>
+                                <td th:text="'Table ' + ${o.tableNumber}"></td>
+                                <td th:text="${#temporals.format(o.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
+                                <td th:text="'₹' + ${o.totalAmount}"></td>
+                                <td><span class="badge bg-secondary" th:text="${o.status}"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Food Items Management -->
+            <div class="content-card mt-4" id="menu">
+                <div class="card-header-flex">
+                    <h3><i class="fas fa-utensils me-2"></i>Menu Items</h3>
+                    <button class="btn-primary-gradient" data-bs-toggle="modal" data-bs-target="#addFoodModal">
+                        <i class="fas fa-plus me-2"></i>Add Item
+                    </button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Availability</th>
+                                <th>Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="f : ${allFoods}">
+                                <td th:text="${f.id}"></td>
+                                <td th:text="${f.name}"></td>
+                                <td th:text="${f.category}"></td>
+                                <td th:text="${f.veg ? 'Veg' : 'Non-Veg'}"></td>
+                                <td th:text="${f.available ? 'Available' : 'Out of Stock'}"></td>
+                                <td th:text="'₹' + ${f.price}"></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a th:href="@{'/admin/delete-food/' + ${f.id}}" class="btn-action btn-delete"><i class="fas fa-trash-alt"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- User Management Section -->
-            <div class="content-card" style="animation-delay: 0.5s">
+            <div class="content-card mt-4" id="staff">
                 <div class="card-header-flex">
                     <div>
-                        <h3><i class="fas fa-user-plus me-2"></i>Add New Staff Member</h3>
-                        <p class="text-muted small">Register new users to the system</p>
+                        <h3><i class="fas fa-user-plus me-2"></i>Add / Manage Users</h3>
                     </div>
                 </div>
                 
-                <form th:action="@{/admin/create-user}" method="post" class="user-form">
+                <form th:action="@{/admin/create-user}" method="post" class="user-form mb-4">
                     <div class="form-grid">
                         <div class="form-group">
                             <label><i class="fas fa-user me-2"></i>Username</label>
-                            <input type="text" name="username" class="form-input" placeholder="Enter username" required>
+                            <input type="text" name="username" class="form-input" placeholder="Username" required>
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-lock me-2"></i>Password</label>
-                            <input type="password" name="password" class="form-input" placeholder="Enter password" required>
+                            <input type="password" name="password" class="form-input" placeholder="Password" required>
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-user-tag me-2"></i>Role</label>
@@ -163,70 +182,31 @@
                                 <option value="ADMIN">Admin</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>&nbsp;</label>
-                            <button type="submit" class="btn-primary-gradient">
-                                <i class="fas fa-plus-circle me-2"></i>
-                                Register User
-                            </button>
+                        <div class="form-group d-flex align-items-end">
+                            <button type="submit" class="btn-primary-gradient w-100 mb-1">Add User</button>
                         </div>
                     </div>
                 </form>
-            </div>
 
-            <!-- Users Table -->
-            <div class="content-card" style="animation-delay: 0.6s">
-                <div class="card-header-flex">
-                    <h3><i class="fas fa-users-cog me-2"></i>User Management</h3>
-                    <div class="table-actions">
-                        <button class="btn-icon" title="Refresh">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                        <button class="btn-icon" title="Export">
-                            <i class="fas fa-download"></i>
-                        </button>
-                    </div>
-                </div>
-                
                 <div class="table-responsive">
                     <table class="modern-table">
                         <thead>
                             <tr>
                                 <th>Username</th>
                                 <th>Role</th>
-                                <th>Status</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="u : ${allUsers}" class="table-row-animated">
+                            <tr th:each="u : ${allUsers}">
+                                <td th:text="${u.username}"></td>
                                 <td>
-                                    <div class="user-cell">
-                                        <div class="user-avatar">
-                                            <i class="fas fa-user"></i>
-                                        </div>
-                                        <span th:text="${u.username}">Username</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="role-badge" th:classappend="${u.role == 'ADMIN'} ? 'role-admin' : 
-                                                                          ${u.role == 'KITCHEN'} ? 'role-kitchen' : 
-                                                                          ${u.role == 'WAITER'} ? 'role-waiter' : 'role-customer'"
+                                    <span class="role-badge" th:classappend="${u.role == 'ADMIN' ? 'role-admin' : (u.role == 'KITCHEN' ? 'role-kitchen' : (u.role == 'WAITER' ? 'role-waiter' : 'role-customer'))}"
                                           th:text="${u.role}">Role</span>
                                 </td>
                                 <td>
-                                    <span class="status-badge status-active">
-                                        <i class="fas fa-circle"></i> Active
-                                    </span>
-                                </td>
-                                <td>
                                     <div class="action-buttons">
-                                        <button class="btn-action btn-edit" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <a th:href="@{'/admin/delete/' + ${u.id}}" class="btn-action btn-delete" title="Delete">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
+                                        <a th:href="@{'/admin/delete/' + ${u.id}}" class="btn-action btn-delete"><i class="fas fa-trash-alt"></i></a>
                                     </div>
                                 </td>
                             </tr>
@@ -235,99 +215,52 @@
                 </div>
             </div>
 
-            <!-- Food Items Management -->
-            <div class="content-card" style="animation-delay: 0.7s">
-                <div class="card-header-flex">
-                    <h3><i class="fas fa-utensils me-2"></i>Menu Items</h3>
-                    <button class="btn-primary-gradient">
-                        <i class="fas fa-plus me-2"></i>Add Item
-                    </button>
-                </div>
-                
-                <div class="table-responsive">
-                    <table class="modern-table">
-                        <thead>
-                            <tr>
-                                <th>Item Name</th>
-                                <th>Price</th>
-                                <th>Category</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="table-row-animated">
-                                <td>
-                                    <div class="food-cell">
-                                        <div class="food-image">
-                                            <i class="fas fa-hamburger"></i>
-                                        </div>
-                                        <span>Cheese Burger</span>
-                                    </div>
-                                </td>
-                                <td><strong class="price-text">$12.00</strong></td>
-                                <td><span class="category-tag">Main Course</span></td>
-                                <td><span class="status-badge status-active"><i class="fas fa-circle"></i> Available</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                                        <button class="btn-action btn-delete"><i class="fas fa-trash-alt"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </main>
     </div>
 
-    <script>
-        // Counter animation for stats
-        document.querySelectorAll('.counter').forEach(counter => {
-            const target = parseInt(counter.getAttribute('data-target'));
-            const duration = 2000;
-            const increment = target / (duration / 16);
-            let current = 0;
+    <!-- Add Food Modal -->
+    <div class="modal fade" id="addFoodModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content text-dark">
+          <form th:action="@{/admin/create-food}" method="post">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Food Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                    <label>Name</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Category (e.g. Starters, Main, Drinks)</label>
+                    <input type="text" name="category" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Price (₹)</label>
+                    <input type="number" step="0.01" name="price" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Image URL</label>
+                    <input type="text" name="imageUrl" class="form-control">
+                </div>
+                <div class="form-check form-switch mb-2">
+                  <input class="form-check-input" type="checkbox" name="veg" checked>
+                  <label class="form-check-label">Is Veg?</label>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" name="available" checked>
+                  <label class="form-check-label">Available?</label>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save Food</button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
-            const updateCounter = () => {
-                current += increment;
-                if (current < target) {
-                    counter.textContent = '$' + Math.ceil(current);
-                    requestAnimationFrame(updateCounter);
-                } else {
-                    counter.textContent = '$' + target;
-                }
-            };
-            setTimeout(updateCounter, 500);
-        });
-
-        // Table row animations on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.table-row-animated').forEach(row => {
-            row.style.opacity = '0';
-            row.style.transform = 'translateY(20px)';
-            row.style.transition = 'all 0.5s ease';
-            observer.observe(row);
-        });
-
-        // Sidebar toggle for mobile
-        document.querySelector('.menu-toggle')?.addEventListener('click', () => {
-            document.querySelector('.modern-sidebar').classList.toggle('active');
-        });
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

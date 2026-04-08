@@ -7,262 +7,157 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <title>Order Food - FoodHub</title>
+    <style>
+        .veg-badge { color: #2e7d32; border: 1px solid #2e7d32; padding: 2px 5px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .nonveg-badge { color: #d32f2f; border: 1px solid #d32f2f; padding: 2px 5px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .quantity-controller { display: flex; align-items: center; gap: 10px; background: #f8f9fa; border-radius: 20px; padding: 5px; border: 1px solid #eee; }
+        .qty-btn { background: white; border: 1px solid #ddd; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; color: var(--accent-primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.2s; }
+        .qty-btn:hover { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+        
+        /* Table Selector UI */
+        .table-selector { position: relative; }
+        .table-badge { background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 2px solid #e0e0e0; padding: 10px 20px; border-radius: 30px; color: #333; font-weight: 700; cursor: pointer; display: flex; align-items: center; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .table-badge:hover { border-color: #d90429; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(217, 4, 41, 0.15); }
+        .table-badge.no-table { border-color: #ff4d6d; animation: pulse-border 2s infinite; color: #d90429; }
+        
+        /* Dropdown style is removed since we use Modal for all table selection to be professional */
+        
+        /* Logout Beautiful */
+        .btn-logout-beautiful { background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); color: white !important; padding: 10px 24px; border-radius: 30px; text-decoration: none; font-weight: bold; transition: 0.3s; box-shadow: 0 4px 10px rgba(255, 65, 108, 0.3); display: flex; align-items: center; justify-content: center; border: none; }
+        .btn-logout-beautiful:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 65, 108, 0.5); color: white; }
+        
+        /* Filter toggles beautifully styled */
+        .veg-switch-wrapper { background: #ffffff; border: 1px solid #e0e0e0; padding: 6px 15px; border-radius: 30px; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .veg-checkbox:checked { background-color: #2e7d32 !important; border-color: #2e7d32 !important; }
+        .nonveg-checkbox:checked { background-color: #d32f2f !important; border-color: #d32f2f !important; }
+        
+        /* Disabled Cart Btn styling */
+        .btn-add-cart.needs-table { background: #f0f0f0; color: #888; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); border: 2px dashed #ccc; }
+        .btn-add-cart.needs-table:hover { transform: none; box-shadow: none; border-color: #ff4d6d; color: #ff4d6d; }
+
+        /* Left Sidebar Layout */
+        .page-wrapper { display: flex; flex-direction: column; min-height: 100vh; background: var(--bg-dark); }
+        .main-layout { display: flex; flex: 1; align-items: stretch; }
+        
+        /* Professional Sidebar */
+        .category-side-panel { width: 280px; min-width: 280px; background: #ffffff; border-right: 1px solid #eaeaea; padding: 40px 25px; box-shadow: 2px 0 15px rgba(0,0,0,0.02); z-index: 10; display: flex; flex-direction: column; }
+        .category-side-panel h4 { font-size: 1.1rem; font-weight: 800; margin-bottom: 30px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
+        .vertical-categories { display: flex; flex-direction: column; gap: 8px; }
+        .vertical-categories .category-pill { display: flex; align-items: center; justify-content: flex-start; gap: 15px; padding: 14px 20px; border-radius: 16px; background: transparent; border: 1px solid transparent; width: 100%; text-align: left; font-size: 1.05rem; color: #555; font-weight: 600; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+        .vertical-categories .category-pill:hover { background: #fff5f6; color: var(--accent-primary); }
+        .vertical-categories .category-pill.active { background: var(--accent-gradient); color: white; box-shadow: 0 8px 20px rgba(217, 4, 41, 0.25); transform: translateX(5px); }
+        
+        /* Grid Area */
+        .menu-container { flex: 1; padding: 40px 50px; background: #fcfcfc; }
+        
+        /* Table Grid Buttons in Modal */
+        .table-btn { border-radius: 16px; transition: 0.3s; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+        .table-btn:hover { background-color: var(--accent-primary); color: white !important; transform: translateY(-3px); box-shadow: 0 6px 15px rgba(217, 4, 41, 0.3); }
+
+        /* Orders Sidebar */
+        .orders-sidebar { position: fixed; right: -450px; top: 0; width: 450px; height: 100vh; background: #fdfdfd; border-left: 1px solid #eaeaea; z-index: 2000; transition: right 0.4s ease; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
+        .orders-sidebar.active { right: 0; }
+        .order-card { background: white; border-radius: 16px; padding: 20px; border: 1px solid #f0f0f0; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.02); }
+        
+        /* Order Progress Steps */
+        .order-progress-steps { display: flex; justify-content: space-between; position: relative; margin: 25px 0; }
+        .order-progress-steps::before { content: ''; position: absolute; top: 15px; left: 10px; right: 10px; height: 3px; background: #eee; z-index: 1; }
+        .step { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; color: #aaa; }
+        .step .icon-circle { width: 34px; height: 34px; border-radius: 50%; background: #eee; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: 0.3s; color: #fff; }
+        .step.active .icon-circle { background: #00C853; box-shadow: 0 0 10px rgba(0, 200, 83, 0.4); }
+        .step.active { color: #00C853; font-weight: bold; }
+        .step span { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        
+        /* Feedback Stars */
+        .feedback-stars i { font-size: 2.5rem; color: #ddd; cursor: pointer; transition: 0.2s; margin: 0 5px; }
+        .feedback-stars i:hover, .feedback-stars i.active { color: #FFD700; transform: scale(1.1); }
+
+        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(217, 4, 41, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(217, 4, 41, 0); } 100% { box-shadow: 0 0 0 0 rgba(217, 4, 41, 0); } }
+    </style>
 </head>
 <body class="menu-body">
     
-    <!-- Top Navigation -->
-    <nav class="menu-navbar">
-        <div class="navbar-brand-section">
-            <h3 class="logo-gradient">
-                <i class="fas fa-hamburger me-2"></i>
-                FoodHub
-            </h3>
-        </div>
-        <div class="navbar-center">
-            <div class="search-bar-inline">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search delicious food..." id="searchInput">
+    <div class="page-wrapper">
+        <!-- Top Navigation -->
+        <nav class="menu-navbar" style="position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+            <div class="navbar-brand-section">
+                <h3 class="logo-gradient mb-0 pb-0">
+                    <i class="fas fa-hamburger me-2"></i>
+                    FoodHub
+                </h3>
             </div>
-        </div>
-        <div class="navbar-actions">
-            <button class="cart-btn" onclick="toggleCart()">
-                <i class="fas fa-shopping-cart"></i>
-                <span class="cart-count">0</span>
-            </button>
-            <span class="table-badge">
-                <i class="fas fa-chair me-1"></i> Table #05
-            </span>
-            <a href="/" class="btn-logout-inline">
-                <i class="fas fa-sign-out-alt"></i>
-            </a>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">Discover Your <span class="gradient-text">Favorite</span> Food</h1>
-                <p class="hero-subtitle">Fresh ingredients, delicious flavors, unforgettable experiences</p>
-                <button class="btn-hero">
-                    <span>Explore Menu</span>
-                    <i class="fas fa-arrow-right ms-2"></i>
+            <div class="navbar-center d-flex align-items-center">
+                <div class="search-bar-inline me-4">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search delicious food..." id="searchInput">
+                </div>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="veg-switch-wrapper form-check form-switch mb-0">
+                        <input class="form-check-input veg-checkbox me-2" type="checkbox" id="vegFilter">
+                        <label class="form-check-label fw-bold text-success" style="cursor:pointer" for="vegFilter"><i class="fas fa-leaf me-1"></i>Veg</label>
+                    </div>
+                    <div class="veg-switch-wrapper form-check form-switch mb-0">
+                        <input class="form-check-input nonveg-checkbox me-2" type="checkbox" id="nonVegFilter">
+                        <label class="form-check-label fw-bold text-danger" style="cursor:pointer" for="nonVegFilter"><i class="fas fa-bone me-1"></i>Non-Veg</label>
+                    </div>
+                </div>
+            </div>
+            <div class="navbar-actions">
+                <button class="cart-btn" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="cart-count">0</span>
                 </button>
+                <button class="btn ms-2 position-relative shadow-sm d-flex align-items-center justify-content-center" style="background:#fff; border: 1px solid #eaeaea; border-radius:12px; width:50px; height:50px; color:var(--accent-primary);" onclick="toggleOrders()">
+                    <i class="fas fa-receipt fs-5"></i>
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" id="activeOrderBadge" style="display:none; font-size: 0.7rem;">0</span>
+                </button>
+                <div class="table-selector ms-3 me-2">
+                    <button class="table-badge no-table" id="tableToggle" onclick="tableModalInst.show()" type="button">
+                        <i class="fas fa-chair me-2"></i>
+                        <span id="selectedTableLabel">Select Table</span>
+                    </button>
+                </div>
+                <a th:href="@{/logout}" class="btn-logout-beautiful ms-3">
+                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                </a>
             </div>
-            <div class="hero-image">
-                <div class="floating-card floating-1">
-                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300" alt="Burger">
-                    <div class="floating-info">
-                        <strong>Burger Deluxe</strong>
-                        <span>$12.99</span>
+        </nav>
+
+        <div class="main-layout">
+            <!-- Professional Left Sidebar -->
+            <aside class="category-side-panel border-end">
+                <h4>Menu Filter</h4>
+                <div class="category-wrapper vertical-categories" id="categorySidebar">
+                    <!-- Javascript will inject curated categories here -->
+                </div>
+                
+
+            </aside>
+
+            <!-- Food Menu Grid Area -->
+            <main class="menu-container">
+                <!-- Hero Section inserted into main container for standard layout -->
+                <section class="hero-section text-center rounded-4 mb-5 shadow-sm" style="background: linear-gradient(135deg, #1a1a1a 0%, #434343 100%); padding: 50px 30px; position: relative; overflow: hidden; color: white;">
+                    <div style="position: absolute; top:-50px; right: -50px; opacity: 0.1;"><i class="fas fa-hamburger fa-10x"></i></div>
+                    <h1 class="fw-bolder mb-3" style="font-size: 3rem;">Discover Your <span style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Favorite</span> Meals</h1>
+                    <p class="fs-5 text-light opacity-75 mb-0">Browse our rich categories, pick your table, and enjoy the culinary experience!</p>
+                </section>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 class="fw-bolder text-dark mb-0"><span id="currentCategoryTitle">All Items</span></h3>
+                </div>
+
+                <div class="food-grid" id="foodGrid">
+                    <div class="text-center w-100 mt-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
                     </div>
                 </div>
-                <div class="floating-card floating-2">
-                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=300" alt="Pizza">
-                    <div class="floating-info">
-                        <strong>Margherita</strong>
-                        <span>$15.99</span>
-                    </div>
-                </div>
-                <div class="floating-card floating-3">
-                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=300" alt="Salad">
-                    <div class="floating-info">
-                        <strong>Fresh Salad</strong>
-                        <span>$8.99</span>
-                    </div>
-                </div>
-            </div>
+            </main>
         </div>
-    </section>
-
-    <!-- Category Pills -->
-    <section class="category-section">
-        <div class="category-wrapper">
-            <button class="category-pill active" data-category="all">
-                <i class="fas fa-th-large"></i>
-                <span>All Items</span>
-            </button>
-            <button class="category-pill" data-category="burgers">
-                <i class="fas fa-hamburger"></i>
-                <span>Burgers</span>
-            </button>
-            <button class="category-pill" data-category="pizza">
-                <i class="fas fa-pizza-slice"></i>
-                <span>Pizza</span>
-            </button>
-            <button class="category-pill" data-category="salads">
-                <i class="fas fa-leaf"></i>
-                <span>Salads</span>
-            </button>
-            <button class="category-pill" data-category="drinks">
-                <i class="fas fa-coffee"></i>
-                <span>Drinks</span>
-            </button>
-            <button class="category-pill" data-category="desserts">
-                <i class="fas fa-ice-cream"></i>
-                <span>Desserts</span>
-            </button>
-        </div>
-    </section>
-
-    <!-- Food Menu Grid -->
-    <main class="menu-container">
-        <div class="food-grid" id="foodGrid">
-            <!-- Food Card 1 -->
-            <article class="food-card-modern" data-category="burgers" style="--delay: 0.1s">
-                <div class="food-image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500" alt="Classic Burger" class="food-image">
-                    <div class="food-badge">Popular</div>
-                    <button class="quick-view-btn">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <div class="food-content">
-                    <div class="food-header">
-                        <h3>Classic Burger</h3>
-                        <button class="favorite-btn">
-                            <i class="far fa-heart"></i>
-                        </button>
-                    </div>
-                    <p class="food-description">Juicy beef patty with fresh vegetables</p>
-                    <div class="food-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span class="rating-text">4.5</span>
-                        <span class="rating-count">(124)</span>
-                    </div>
-                    <div class="food-footer">
-                        <div class="price-section">
-                            <span class="price-label">Price</span>
-                            <h4 class="price">$12.00</h4>
-                        </div>
-                        <button class="btn-add-cart" onclick="addToCart('Classic Burger', 12.00)">
-                            <i class="fas fa-plus"></i>
-                            <span>Add</span>
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Food Card 2 -->
-            <article class="food-card-modern" data-category="pizza" style="--delay: 0.2s">
-                <div class="food-image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500" alt="Margherita Pizza">
-                    <div class="food-badge badge-new">New</div>
-                    <button class="quick-view-btn">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <div class="food-content">
-                    <div class="food-header">
-                        <h3>Margherita Pizza</h3>
-                        <button class="favorite-btn">
-                            <i class="far fa-heart"></i>
-                        </button>
-                    </div>
-                    <p class="food-description">Fresh mozzarella, tomato & basil</p>
-                    <div class="food-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <span class="rating-text">5.0</span>
-                        <span class="rating-count">(89)</span>
-                    </div>
-                    <div class="food-footer">
-                        <div class="price-section">
-                            <span class="price-label">Price</span>
-                            <h4 class="price">$15.99</h4>
-                        </div>
-                        <button class="btn-add-cart" onclick="addToCart('Margherita Pizza', 15.99)">
-                            <i class="fas fa-plus"></i>
-                            <span>Add</span>
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Food Card 3 -->
-            <article class="food-card-modern" data-category="salads" style="--delay: 0.3s">
-                <div class="food-image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500" alt="Caesar Salad">
-                    <button class="quick-view-btn">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <div class="food-content">
-                    <div class="food-header">
-                        <h3>Caesar Salad</h3>
-                        <button class="favorite-btn">
-                            <i class="far fa-heart"></i>
-                        </button>
-                    </div>
-                    <p class="food-description">Crispy romaine with parmesan</p>
-                    <div class="food-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="far fa-star"></i>
-                        <span class="rating-text">4.0</span>
-                        <span class="rating-count">(56)</span>
-                    </div>
-                    <div class="food-footer">
-                        <div class="price-section">
-                            <span class="price-label">Price</span>
-                            <h4 class="price">$8.99</h4>
-                        </div>
-                        <button class="btn-add-cart" onclick="addToCart('Caesar Salad', 8.99)">
-                            <i class="fas fa-plus"></i>
-                            <span>Add</span>
-                        </button>
-                    </div>
-                </div>
-            </article>
-
-            <!-- Food Card 4 -->
-            <article class="food-card-modern" data-category="burgers" style="--delay: 0.4s">
-                <div class="food-image-wrapper">
-                    <img src="https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=500" alt="Chicken Burger">
-                    <button class="quick-view-btn">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                <div class="food-content">
-                    <div class="food-header">
-                        <h3>Chicken Burger</h3>
-                        <button class="favorite-btn">
-                            <i class="far fa-heart"></i>
-                        </button>
-                    </div>
-                    <p class="food-description">Crispy chicken with special sauce</p>
-                    <div class="food-rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                        <span class="rating-text">4.7</span>
-                        <span class="rating-count">(98)</span>
-                    </div>
-                    <div class="food-footer">
-                        <div class="price-section">
-                            <span class="price-label">Price</span>
-                            <h4 class="price">$13.50</h4>
-                        </div>
-                        <button class="btn-add-cart" onclick="addToCart('Chicken Burger', 13.50)">
-                            <i class="fas fa-plus"></i>
-                            <span>Add</span>
-                        </button>
-                    </div>
-                </div>
-            </article>
-        </div>
-    </main>
+    </div>
 
     <!-- Floating Cart Sidebar -->
     <div class="cart-sidebar" id="cartSidebar">
@@ -282,128 +177,581 @@
         <div class="cart-footer">
             <div class="cart-total">
                 <span>Total:</span>
-                <h3 id="cartTotal">$0.00</h3>
+                <h3 id="cartTotal">₹0.00</h3>
             </div>
-            <button class="btn-checkout">
+            <button class="btn-checkout" onclick="proceedToPayment()">
                 <i class="fas fa-credit-card me-2"></i>
                 Proceed to Checkout
             </button>
         </div>
     </div>
 
+    <!-- Professional Table Selection Modal -->
+    <div class="modal fade" id="tableSelectModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+          <div class="modal-header border-0 pb-0 justify-content-center mt-3">
+             <div class="text-center">
+                 <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex p-3 mb-2">
+                     <i class="fas fa-chair text-danger fa-2x"></i>
+                 </div>
+                 <h4 class="modal-title fw-bold">Select Your Table</h4>
+                 <p class="text-muted mb-0 mt-2 px-2">Tap an available table number to begin ordering.</p>
+             </div>
+          </div>
+          <div class="modal-body text-center pt-4 pb-5 px-sm-5">
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <button class="btn btn-outline-danger table-btn fs-5 border-2" onclick="syncAndSelectTable(1)">1</button>
+                <button class="btn btn-outline-danger table-btn fs-5 border-2" onclick="syncAndSelectTable(2)">2</button>
+                <button class="btn btn-outline-danger table-btn fs-5 border-2" onclick="syncAndSelectTable(3)">3</button>
+                <button class="btn btn-outline-danger table-btn fs-5 border-2" onclick="syncAndSelectTable(4)">4</button>
+                <button class="btn btn-outline-danger table-btn fs-5 border-2" onclick="syncAndSelectTable(5)">5</button>
+                <button class="btn btn-outline-danger table-btn fs-5 border-2" onclick="syncAndSelectTable(6)">6</button>
+                <button class="btn btn-outline-danger table-btn fs-5 border-2" onclick="syncAndSelectTable(7)">7</button>
+                <button class="btn btn-outline-danger table-btn fs-5 border-2" onclick="syncAndSelectTable(8)">8</button>
+                <button class="btn btn-outline-danger table-btn fs-5 border-2" onclick="syncAndSelectTable(9)">9</button>
+                <button class="btn btn-outline-danger table-btn fs-5 border-2" onclick="syncAndSelectTable(10)">10</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dummy Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title ms-2 mt-2"><i class="fas fa-lock text-success me-2"></i>Secure Checkout</h5>
+            <button type="button" class="btn-close me-2 mt-2" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <h4 class="mb-1 text-muted">Total Amount</h4>
+            <h2 id="paymentTotal" class="text-primary fw-bolder display-5 mb-4"></h2>
+            <div class="d-grid gap-3 px-3 mt-4">
+                <button class="btn btn-outline-primary btn-lg rounded-pill" onclick="completePayment('Credit Card')">
+                    <i class="fas fa-credit-card me-2"></i>Pay via Credit Card
+                </button>
+                <button class="btn btn-outline-success btn-lg rounded-pill" onclick="completePayment('UPI')">
+                    <i class="fas fa-mobile-alt me-2"></i>Pay via UPI App
+                </button>
+                <button class="btn btn-outline-dark btn-lg rounded-pill" onclick="completePayment('Cash')">
+                    <i class="fas fa-wallet me-2"></i>Pay Cash at Counter
+                </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Orders Sidebar -->
+    <div class="orders-sidebar" id="ordersSidebar">
+        <div class="cart-header shadow-sm bg-white" style="z-index:10; padding:25px;">
+            <h3 class="mb-0 fs-5 fw-bold d-flex align-items-center"><i class="fas fa-receipt me-2 text-primary"></i>My Live Orders</h3>
+            <button class="cart-close text-muted" onclick="toggleOrders()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="flex-grow-1 overflow-auto p-4" id="ordersContainer" style="background:#fafafa;">
+            <div class="text-center mt-5 pt-4 opacity-50">
+                <i class="fas fa-history fa-4x mb-3 text-muted"></i>
+                <h5 class="fw-bold">No active orders</h5>
+                <p>Track your delicious food here.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+          <div class="modal-header border-0 pb-0 justify-content-end">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center px-5 pb-5 pt-2">
+            <i class="fas fa-smile-beam text-success fa-4x mb-3"></i>
+            <h3 class="fw-bold mb-1">How was your meal?</h3>
+            <p class="text-muted mb-4">Your feedback helps us improve.</p>
+            <div class="feedback-stars mb-4" id="feedbackStars">
+                <i class="fas fa-star" onclick="setRating(1)"></i>
+                <i class="fas fa-star" onclick="setRating(2)"></i>
+                <i class="fas fa-star" onclick="setRating(3)"></i>
+                <i class="fas fa-star" onclick="setRating(4)"></i>
+                <i class="fas fa-star" onclick="setRating(5)"></i>
+            </div>
+            <textarea class="form-control mb-4" rows="3" placeholder="Tell us what you loved..." style="border-radius:12px;"></textarea>
+            <button class="btn btn-success btn-lg w-100 rounded-pill fw-bold shadow-sm" onclick="submitFeedback()">Submit Review</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let cart = [];
-        let cartCount = 0;
+        let allFoodItems = [];
+        let cart = {}; // foodId -> { item, quantity }
+        let selectedTable = "";
+        let activeOrders = [];
+        let pollingInterval = null;
         
-        // Category filtering
-        document.querySelectorAll('.category-pill').forEach(pill => {
-            pill.addEventListener('click', function() {
-                document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-                
-                const category = this.getAttribute('data-category');
-                const cards = document.querySelectorAll('.food-card-modern');
-                
-                cards.forEach(card => {
-                    if (category === 'all' || card.getAttribute('data-category') === category) {
-                        card.style.display = 'flex';
-                        card.style.animation = 'fadeInScale 0.5s ease forwards';
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-            });
+        let paymentModalInst;
+        let tableModalInst;
+        let feedbackModalInst;
+
+        const fixedCategories = [
+            { id: 'all', name: 'All Items', icon: 'fa-th-large' },
+            { id: 'starters', name: 'Starters', icon: 'fa-seedling' },
+            { id: 'drinks', name: 'Drinks', icon: 'fa-glass-martini-alt' },
+            { id: 'seafood', name: 'Seafood', icon: 'fa-fish' },
+            { id: 'chinese', name: 'Chinese', icon: 'fa-yin-yang' },
+            { id: 'rice', name: 'Rice & Biryani', icon: 'fa-concierge-bell' },
+            { id: 'desserts', name: 'Desserts', icon: 'fa-ice-cream' },
+            { id: 'main course', name: 'Main Course', icon: 'fa-utensils' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            paymentModalInst = new bootstrap.Modal(document.getElementById('paymentModal'));
+            tableModalInst = new bootstrap.Modal(document.getElementById('tableSelectModal'));
+            fetchFoodItems();
+            renderCategories();
         });
 
-        // Add to cart functionality
-        function addToCart(name, price) {
-            cart.push({ name, price });
-            cartCount++;
-            updateCart();
-            
-            // Show notification
-            showNotification(`${name} added to cart!`);
+        function fetchFoodItems() {
+            fetch('/api/food-items')
+                .then(r => r.json())
+                .then(data => {
+                    allFoodItems = data;
+                    renderFoodGrid('all');
+                })
+                .catch(e => {
+                    document.getElementById('foodGrid').innerHTML = '<p class="text-danger">Failed to load menu items.</p>';
+                });
         }
 
-        function updateCart() {
-            document.querySelector('.cart-count').textContent = cartCount;
-            const cartItems = document.getElementById('cartItems');
+        function renderCategories() {
+            let html = '';
+            fixedCategories.forEach(cat => {
+                html += `
+                    <button class="category-pill ${cat.id === 'all' ? 'active' : ''}" data-category="${cat.id}" data-name="${cat.name}" onclick="filterCategory('${cat.id}')">
+                        <i class="fas ${cat.icon} fa-fw"></i>
+                        <span>${cat.name}</span>
+                    </button>
+                `;
+            });
+            document.getElementById('categorySidebar').innerHTML = html;
             
-            if (cart.length === 0) {
-                cartItems.innerHTML = `
-                    <div class="empty-cart">
-                        <i class="fas fa-shopping-basket"></i>
-                        <p>Your cart is empty</p>
-                        <span>Add some delicious items!</span>
-                    </div>
+            // Append Premium Info Box exactly at the bottom of the sidebar
+            document.getElementById('categorySidebar').insertAdjacentHTML('afterend', `
+                <div class="premium-box mt-auto mx-1 pb-2">
+                   <div class="d-flex align-items-center p-3 mt-4" style="background:#fff; border: 1px solid #f0f0f0; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,0.04);">
+                       <div class="text-warning bg-warning bg-opacity-10 rounded-circle d-flex justify-content-center align-items-center me-3 flex-shrink-0" style="width:40px; height:40px;">
+                           <i class="fas fa-crown"></i>
+                       </div>
+                       <div>
+                           <h6 class="mb-0 fw-bolder text-dark" style="font-size: 0.9rem;">Fresh & Premium</h6>
+                           <small class="text-muted" style="font-size: 0.75rem;">100% Quality Ingredients</small>
+                       </div>
+                   </div>
+                </div>
+            `);
+        }
+
+        function filterCategory(cat) {
+            document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+            let selected = document.querySelector(`.category-pill[data-category="${cat.toLowerCase()}"]`);
+            if(!selected) selected = document.querySelector(`.category-pill[data-category="all"]`);
+            if(selected) {
+                selected.classList.add('active');
+                document.getElementById('currentCategoryTitle').textContent = selected.getAttribute('data-name');
+            }
+            renderFoodGrid(cat);
+        }
+
+        function getActionHtml(id) {
+            const qty = cart[id] ? cart[id].quantity : 0;
+            const needsTableClass = !selectedTable ? 'needs-table' : '';
+            if(qty === 0) {
+                return `
+                    <button class="btn-add-cart ${needsTableClass}" onclick="addToCart(${id})">
+                        <i class="fas ${!selectedTable ? 'fa-chair' : 'fa-plus'}"></i>
+                        <span>${!selectedTable ? 'Add' : 'Add'}</span>
+                    </button>
                 `;
             } else {
-                let itemsHTML = '';
-                let total = 0;
-                cart.forEach((item, index) => {
-                    total += item.price;
-                    itemsHTML += `
-                        <div class="cart-item">
-                            <div class="cart-item-info">
-                                <h4>${item.name}</h4>
-                                <p>$${item.price.toFixed(2)}</p>
-                            </div>
-                            <button class="cart-item-remove" onclick="removeFromCart(${index})">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    `;
-                });
-                cartItems.innerHTML = itemsHTML;
-                document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+                return `
+                    <div class="quantity-controller">
+                        <button class="qty-btn" onclick="updateQty(${id}, -1)"><i class="fas fa-minus"></i></button>
+                        <span class="fw-bold px-2 fs-5" style="min-width:24px; text-align:center;">${qty}</span>
+                        <button class="qty-btn" onclick="updateQty(${id}, 1)"><i class="fas fa-plus"></i></button>
+                    </div>
+                `;
             }
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            cartCount--;
-            updateCart();
+        function renderFoodGrid(category) {
+            const grid = document.getElementById('foodGrid');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const vegOnly = document.getElementById('vegFilter').checked;
+            const nonVegOnly = document.getElementById('nonVegFilter').checked;
+
+            let filtered = allFoodItems;
+
+            if (category !== 'all') {
+                filtered = filtered.filter(f => f.category && f.category.toLowerCase().includes(category.toLowerCase()));
+            }
+            if (search) {
+                filtered = filtered.filter(f => f.name.toLowerCase().includes(search));
+            }
+            if (vegOnly) {
+                filtered = filtered.filter(f => f.veg);
+            } else if (nonVegOnly) {
+                filtered = filtered.filter(f => !f.veg);
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-12 text-center text-muted py-5"><i class="fas fa-search fa-3x mb-3 opacity-25"></i><h4>No items found</h4><p>Try clearing your filters or check another category.</p></div>';
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(item => {
+                const vegBadge = item.veg ? '<div class="food-badge" style="background:#e8f5e9; color:#2e7d32; border:1px solid #2e7d32; padding:4px 12px;"><i class="fas fa-leaf me-1"></i>Veg</div>' : '<div class="food-badge" style="background:#ffebee; color:#d32f2f; border:1px solid #d32f2f; padding:4px 12px;"><i class="fas fa-bone me-1"></i>Non-Veg</div>';
+                const img = item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500';
+                
+                html += `
+                <article class="food-card-modern bg-white" style="--delay: 0.1s; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow: hidden;">
+                    <div class="food-image-wrapper" style="height: 200px;">
+                        <img src="${img}" alt="${item.name}" class="food-image w-100 h-100 object-fit-cover">
+                        ${vegBadge}
+                    </div>
+                    <div class="food-content p-4 d-flex flex-column h-100">
+                        <div class="food-header mb-1 text-dark">
+                            <h4 class="fw-bolder mb-0">${item.name}</h4>
+                        </div>
+                        <p class="food-description text-muted small fw-semibold mb-3">${item.category}</p>
+                        
+                        <div class="food-footer mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                            <div class="price-section">
+                                <h4 class="price text-danger mb-0 fw-black">₹${item.price.toFixed(2)}</h4>
+                            </div>
+                            <div id="action-container-${item.id}">
+                                ${getActionHtml(item.id)}
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                `;
+            });
+            grid.innerHTML = html;
+        }
+
+        // Filters
+        document.getElementById('searchInput').addEventListener('input', () => renderFoodGrid(getActiveCategory()));
+        document.getElementById('vegFilter').addEventListener('change', (e) => {
+            if(e.target.checked) document.getElementById('nonVegFilter').checked = false;
+            renderFoodGrid(getActiveCategory());
+        });
+        document.getElementById('nonVegFilter').addEventListener('change', (e) => {
+            if(e.target.checked) document.getElementById('vegFilter').checked = false;
+            renderFoodGrid(getActiveCategory());
+        });
+
+        function getActiveCategory() {
+            const active = document.querySelector('.category-pill.active');
+            return active ? active.getAttribute('data-category') : 'all';
+        }
+
+        function addToCart(id) {
+            if (!selectedTable) {
+                tableModalInst.show();
+                return;
+            }
+            const item = allFoodItems.find(f => f.id === id);
+            if(item) {
+                if(!cart[id]) cart[id] = { item: item, quantity: 1 };
+                else cart[id].quantity += 1;
+                
+                showNotification(`Added ${item.name}!`);
+                updateCartUI();
+                
+                // Update DOM locally instead of full refresh
+                const container = document.getElementById(`action-container-${id}`);
+                if(container) container.innerHTML = getActionHtml(id);
+            }
+        }
+
+        function updateQty(id, delta) {
+            if(cart[id]) {
+                cart[id].quantity += delta;
+                if(cart[id].quantity <= 0) {
+                    delete cart[id];
+                }
+                updateCartUI();
+                
+                // Update DOM locally instead of full refresh to avoid image flickering
+                const container = document.getElementById(`action-container-${id}`);
+                if(container) container.innerHTML = getActionHtml(id);
+            }
+        }
+
+        function updateCartUI() {
+            const cartItemsContainer = document.getElementById('cartItems');
+            let total = 0;
+            let count = 0;
+            let html = '';
+
+            for(let id in cart) {
+                const c = cart[id];
+                total += (c.item.price * c.quantity);
+                count += c.quantity;
+                html += `
+                    <div class="cart-item shadow-sm position-relative" style="background: #fff; padding: 15px; border-radius: 16px; margin-bottom: 15px; border: 1px solid #f0f0f0;">
+                        <div class="d-flex flex-column gap-1 me-auto">
+                            <h6 class="fw-bolder text-dark mb-0">${c.item.name}</h6>
+                            <span class="text-accent fw-bold" style="color: #ff4d6d;">₹${c.item.price.toFixed(2)}</span>
+                        </div>
+                        <div class="d-flex align-items-center bg-light rounded-pill px-2 py-1 ms-3 border mt-2">
+                            <button class="btn btn-sm btn-link text-dark text-decoration-none p-0 mx-1" onclick="updateQty(${id}, -1)">
+                                <i class="fas ${c.quantity === 1 ? 'fa-trash-alt text-danger' : 'fa-minus'} px-1"></i>
+                            </button>
+                            <span class="fw-bolder mx-2 fs-6">${c.quantity}</span>
+                            <button class="btn btn-sm btn-link text-dark text-decoration-none p-0 mx-1" onclick="updateQty(${id}, 1)">
+                                <i class="fas fa-plus px-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if(count === 0) {
+                cartItemsContainer.innerHTML = `
+                    <div class="empty-cart border-top-0 d-flex flex-column align-items-center justify-content-center h-100 pt-5 mt-5">
+                        <i class="fas fa-shopping-bag fa-4x text-light mb-4 shadow-sm" style="color:#eee !important;"></i>
+                        <h5 class="text-muted fw-bold">Cart is empty</h5>
+                        <small class="text-muted">Start adding delicious items!</small>
+                    </div>`;
+            } else {
+                cartItemsContainer.innerHTML = html;
+            }
+
+            document.querySelector('.cart-count').textContent = count;
+            document.getElementById('cartTotal').textContent = `₹${total.toFixed(2)}`;
         }
 
         function toggleCart() {
             document.getElementById('cartSidebar').classList.toggle('active');
         }
 
+        // Handles selection from the Modal grid
+        function syncAndSelectTable(tableNumber) {
+            if (tableNumber) {
+                selectedTable = tableNumber;
+                const tableToggleBtn = document.getElementById('tableToggle');
+                const tableLabel = document.getElementById('selectedTableLabel');
+
+                tableLabel.innerHTML = `Table <span class='badge bg-danger rounded-pill fs-6 ms-1 px-3'>${tableNumber}</span>`;
+                tableToggleBtn.classList.remove('no-table');
+                
+                // Update all "Needs Table" buttons safely without a full refresh loop
+                document.querySelectorAll('.needs-table').forEach(btn => {
+                    btn.classList.remove('needs-table');
+                    btn.innerHTML = `<i class="fas fa-plus"></i><span>Add</span>`;
+                });
+                
+                setTimeout(() => tableModalInst.hide(), 150);
+                showNotification(`Assigned to Table ${tableNumber}`);
+            }
+        }
+
         function showNotification(message) {
             const notification = document.createElement('div');
-            notification.className = 'notification-toast';
-            notification.innerHTML = `<i class="fas fa-check-circle me-2"></i>${message}`;
+            notification.className = 'notification-toast bg-white shadow py-3 px-4';
+            notification.style.cssText = 'border-radius: 12px; border-left: 5px solid #00C853; font-weight: 600; color: #333;';
+            notification.innerHTML = `<i class="fas fa-check-circle text-success me-3 fs-4"></i><span>${message}</span>`;
             document.body.appendChild(notification);
             
-            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => notification.classList.add('show'), 50);
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => notification.remove(), 300);
-            }, 3000);
+            }, 2500);
         }
 
-        // Favorite button functionality
-        document.querySelectorAll('.favorite-btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                this.querySelector('i').classList.toggle('far');
-                this.querySelector('i').classList.toggle('fas');
-                this.classList.toggle('active');
-            });
-        });
+        function proceedToPayment() {
+            const keys = Object.keys(cart);
+            if(keys.length === 0) {
+                showNotification("Cart is empty!");
+                return;
+            }
+            if(!selectedTable) {
+                toggleCart();
+                tableModalInst.show();
+                return;
+            }
+            document.getElementById('paymentTotal').textContent = document.getElementById('cartTotal').textContent;
+            paymentModalInst.show();
+        }
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            document.querySelectorAll('.food-card-modern').forEach(card => {
-                const title = card.querySelector('h3').textContent.toLowerCase();
-                if (title.includes(searchTerm)) {
-                    card.style.display = 'flex';
+        function completePayment(method) {
+            const payload = {
+                tableNumber: parseInt(selectedTable),
+                items: Object.keys(cart).map(id => ({
+                    foodItemId: parseInt(id),
+                    quantity: cart[id].quantity
+                }))
+            };
+
+            fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(orderData => {
+                if(orderData.id) {
+                    paymentModalInst.hide();
+                    showNotification(`Payment successful via ${method}! Order Placed.`);
+                    cart = {};
+                    updateCartUI();
+                    renderFoodGrid(getActiveCategory());
+                    document.getElementById('cartSidebar').classList.remove('active');
+                    
+                    trackNewOrder(orderData);
+                    toggleOrders(true); // Open orders sidebar to show tracking
                 } else {
-                    card.style.display = 'none';
+                    showNotification("Failed to place order.");
                 }
+            })
+            .catch(e => showNotification("Network error."));
+        }
+
+        function toggleOrders(forceOpen) {
+            const sidebar = document.getElementById('ordersSidebar');
+            if (forceOpen === true) {
+                sidebar.classList.add('active');
+            } else {
+                sidebar.classList.toggle('active');
+            }
+        }
+
+        function trackNewOrder(order) {
+            activeOrders.push(order);
+            const badge = document.getElementById('activeOrderBadge');
+            badge.style.display = 'block';
+            badge.textContent = activeOrders.length;
+            renderOrdersUI();
+            
+            if(!pollingInterval) {
+                pollingInterval = setInterval(pollOrders, 3000); // Poll every 3 seconds
+            }
+        }
+
+        function pollOrders() {
+            if(activeOrders.length === 0) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+                return;
+            }
+            
+            activeOrders.forEach((order, index) => {
+                fetch(`/api/orders/${order.id}`)
+                .then(r => r.json())
+                .then(updated => {
+                    if(updated.status !== order.status) {
+                        showNotification(`Order #${updated.id} is now ${updated.status}!`);
+                        activeOrders[index] = updated;
+                        renderOrdersUI();
+                    }
+                });
             });
-        });
+        }
+
+        function renderOrdersUI() {
+            const container = document.getElementById('ordersContainer');
+            if(activeOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center mt-5 pt-4 opacity-50">
+                        <i class="fas fa-history fa-4x mb-3 text-muted"></i>
+                        <h5 class="fw-bold">No active orders</h5>
+                        <p>Track your delicious food here.</p>
+                    </div>`;
+                return;
+            }
+
+            let html = '';
+            // Display newest at the top
+            [...activeOrders].reverse().forEach(o => {
+                const s1 = (o.status==='PLACED'||o.status==='COOKING'||o.status==='READY'||o.status==='SERVED') ? 'active' : '';
+                const s2 = (o.status==='COOKING'||o.status==='READY'||o.status==='SERVED') ? 'active' : '';
+                const s3 = (o.status==='READY'||o.status==='SERVED') ? 'active' : '';
+                const s4 = (o.status==='SERVED') ? 'active' : '';
+
+                let feedbackBtn = '';
+                if(o.status === 'SERVED') {
+                    feedbackBtn = `<button class="btn btn-outline-success w-100 mt-4 rounded-pill fw-bold" onclick="openFeedback(${o.id})"><i class="fas fa-star me-2 mb-1 text-warning"></i> Leave Feedback & Complete</button>`;
+                }
+
+                html += `
+                    <div class="order-card" id="tracked-order-${o.id}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h5 class="fw-bold mb-0 text-dark">Order #${o.id}</h5>
+                            <span class="badge bg-dark rounded-pill px-3 py-2 fs-6">₹${o.totalAmount ? o.totalAmount.toFixed(2) : '0.00'}</span>
+                        </div>
+                        <p class="text-muted small mb-4 fw-semibold"><i class="fas fa-clock me-1 text-primary"></i> ${new Date(o.createdAt).toLocaleTimeString()}</p>
+                        
+                        <div class="order-progress-steps">
+                            <div class="step ${s1}">
+                                <div class="icon-circle"><i class="fas fa-clipboard-check"></i></div>
+                                <span>Placed</span>
+                            </div>
+                            <div class="step ${s2}">
+                                <div class="icon-circle"><i class="fas fa-fire"></i></div>
+                                <span>Cooking</span>
+                            </div>
+                            <div class="step ${s3}">
+                                <div class="icon-circle"><i class="fas fa-bell"></i></div>
+                                <span>Ready</span>
+                            </div>
+                            <div class="step ${s4}">
+                                <div class="icon-circle"><i class="fas fa-utensils"></i></div>
+                                <span>Served</span>
+                            </div>
+                        </div>
+                        ${feedbackBtn}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        let feedbackOrderId = null;
+        function openFeedback(id) {
+            feedbackOrderId = id;
+            if(!feedbackModalInst) feedbackModalInst = new bootstrap.Modal(document.getElementById('feedbackModal'));
+            document.querySelectorAll('.feedback-stars i').forEach(st => st.classList.remove('active'));
+            document.querySelector('#feedbackModal textarea').value = '';
+            feedbackModalInst.show();
+        }
+
+        function setRating(val) {
+            const stars = document.querySelectorAll('.feedback-stars i');
+            stars.forEach((st, idx) => {
+                if(idx < val) st.classList.add('active');
+                else st.classList.remove('active');
+            });
+        }
+
+        function submitFeedback() {
+            if(feedbackModalInst) feedbackModalInst.hide();
+            showNotification(`Thank you for your rating! ❤️`);
+            
+            // Remove the served order from local tracking to complete it
+            activeOrders = activeOrders.filter(o => o.id !== feedbackOrderId);
+            const badge = document.getElementById('activeOrderBadge');
+            badge.textContent = activeOrders.length;
+            if(activeOrders.length === 0) badge.style.display = 'none';
+            renderOrdersUI();
+        }
     </script>
 </body>
 </html>

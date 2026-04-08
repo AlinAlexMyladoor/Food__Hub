@@ -9,267 +9,90 @@
     <title>Kitchen Display</title>
 </head>
 <body class="kitchen-body">
-    
-    <!-- Kitchen Header -->
     <header class="kitchen-header">
         <div class="header-left">
-            <div class="logo-badge">
-                <i class="fas fa-fire"></i>
-                <span>Kitchen</span>
-            </div>
+            <div class="logo-badge"><i class="fas fa-fire"></i><span>Kitchen</span></div>
             <h2>Live Orders Dashboard</h2>
         </div>
         <div class="header-center">
-            <div class="time-badge">
-                <i class="far fa-clock me-2"></i>
-                <span id="currentTime"></span>
-            </div>
+            <div class="time-badge"><i class="far fa-clock me-2"></i><span id="currentTime"></span></div>
         </div>
         <div class="header-right">
-            <div class="stats-mini">
-                <div class="stat-mini">
-                    <span class="stat-value">8</span>
-                    <span class="stat-label">Pending</span>
-                </div>
-                <div class="stat-mini">
-                    <span class="stat-value">12</span>
-                    <span class="stat-label">Preparing</span>
-                </div>
-                <div class="stat-mini">
-                    <span class="stat-value">24</span>
-                    <span class="stat-label">Completed</span>
-                </div>
-            </div>
-            <a href="/" class="btn-logout-inline">
-                <i class="fas fa-sign-out-alt"></i>
-            </a>
+            <a th:href="@{/logout}" class="btn-logout-inline"><i class="fas fa-sign-out-alt"></i></a>
         </div>
     </header>
 
-    <!-- Kanban Board -->
-    <main class="kitchen-container">
-        <!-- Pending Orders -->
+    <main class="kitchen-container" id="kanban-board">
         <section class="order-column">
             <div class="column-header column-pending">
                 <i class="fas fa-clock"></i>
-                <h3>New Orders</h3>
-                <span class="order-count">3</span>
+                <h3>New Orders (PLACED)</h3>
             </div>
-            <div class="orders-list">
-                <article class="order-card order-new" style="--delay: 0.1s">
-                    <div class="order-header">
-                        <div class="order-number">#102</div>
-                        <div class="order-time">2 min ago</div>
-                    </div>
-                    <div class="order-items">
-                        <div class="order-item">
-                            <span class="item-qty">2x</span>
-                            <span class="item-name">Cheese Burger</span>
-                        </div>
-                        <div class="order-item">
-                            <span class="item-qty">1x</span>
-                            <span class="item-name">Coke</span>
-                        </div>
-                    </div>
-                    <div class="order-meta">
-                        <span class="table-info"><i class="fas fa-chair"></i> Table 05</span>
-                        <span class="priority-badge priority-high">Urgent</span>
-                    </div>
-                    <button class="btn-order-action btn-start">
-                        <i class="fas fa-play"></i>
-                        Start Preparing
-                    </button>
-                </article>
-
-                <article class="order-card order-new" style="--delay: 0.2s">
-                    <div class="order-header">
-                        <div class="order-number">#103</div>
-                        <div class="order-time">5 min ago</div>
-                    </div>
-                    <div class="order-items">
-                        <div class="order-item">
-                            <span class="item-qty">1x</span>
-                            <span class="item-name">Margherita Pizza</span>
-                        </div>
-                        <div class="order-item">
-                            <span class="item-qty">1x</span>
-                            <span class="item-name">Caesar Salad</span>
-                        </div>
-                    </div>
-                    <div class="order-meta">
-                        <span class="table-info"><i class="fas fa-chair"></i> Table 12</span>
-                        <span class="priority-badge priority-normal">Normal</span>
-                    </div>
-                    <button class="btn-order-action btn-start">
-                        <i class="fas fa-play"></i>
-                        Start Preparing
-                    </button>
-                </article>
-            </div>
+            <div class="orders-list" id="placedList"></div>
         </section>
 
-        <!-- Preparing Orders -->
         <section class="order-column">
             <div class="column-header column-preparing">
                 <i class="fas fa-fire"></i>
-                <h3>Preparing</h3>
-                <span class="order-count">2</span>
+                <h3>Preparing (COOKING)</h3>
             </div>
-            <div class="orders-list">
-                <article class="order-card order-preparing" style="--delay: 0.1s">
-                    <div class="order-header">
-                        <div class="order-number">#100</div>
-                        <div class="order-time">8 min ago</div>
-                    </div>
-                    <div class="order-items">
-                        <div class="order-item">
-                            <span class="item-qty">3x</span>
-                            <span class="item-name">Chicken Burger</span>
-                        </div>
-                        <div class="order-item">
-                            <span class="item-qty">2x</span>
-                            <span class="item-name">Fries</span>
-                        </div>
-                    </div>
-                    <div class="order-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 65%"></div>
-                        </div>
-                        <span class="progress-text">65% Complete</span>
-                    </div>
-                    <div class="order-meta">
-                        <span class="table-info"><i class="fas fa-chair"></i> Table 03</span>
-                        <span class="priority-badge priority-high">Urgent</span>
-                    </div>
-                    <button class="btn-order-action btn-complete">
-                        <i class="fas fa-check"></i>
-                        Mark as Ready
-                    </button>
-                </article>
-
-                <article class="order-card order-preparing" style="--delay: 0.2s">
-                    <div class="order-header">
-                        <div class="order-number">#101</div>
-                        <div class="order-time">12 min ago</div>
-                    </div>
-                    <div class="order-items">
-                        <div class="order-item">
-                            <span class="item-qty">2x</span>
-                            <span class="item-name">Pasta Carbonara</span>
-                        </div>
-                    </div>
-                    <div class="order-progress">
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 40%"></div>
-                        </div>
-                        <span class="progress-text">40% Complete</span>
-                    </div>
-                    <div class="order-meta">
-                        <span class="table-info"><i class="fas fa-chair"></i> Table 08</span>
-                        <span class="priority-badge priority-normal">Normal</span>
-                    </div>
-                    <button class="btn-order-action btn-complete">
-                        <i class="fas fa-check"></i>
-                        Mark as Ready
-                    </button>
-                </article>
-            </div>
-        </section>
-
-        <!-- Ready Orders -->
-        <section class="order-column">
-            <div class="column-header column-ready">
-                <i class="fas fa-check-circle"></i>
-                <h3>Ready to Serve</h3>
-                <span class="order-count">1</span>
-            </div>
-            <div class="orders-list">
-                <article class="order-card order-ready" style="--delay: 0.1s">
-                    <div class="order-header">
-                        <div class="order-number">#099</div>
-                        <div class="order-time">1 min ago</div>
-                    </div>
-                    <div class="order-items">
-                        <div class="order-item">
-                            <span class="item-qty">1x</span>
-                            <span class="item-name">Steak</span>
-                        </div>
-                        <div class="order-item">
-                            <span class="item-qty">1x</span>
-                            <span class="item-name">Red Wine</span>
-                        </div>
-                    </div>
-                    <div class="ready-indicator">
-                        <i class="fas fa-concierge-bell"></i>
-                        <span>Waiting for pickup</span>
-                    </div>
-                    <div class="order-meta">
-                        <span class="table-info"><i class="fas fa-chair"></i> Table 15</span>
-                        <span class="priority-badge priority-normal">Normal</span>
-                    </div>
-                    <button class="btn-order-action btn-served">
-                        <i class="fas fa-utensils"></i>
-                        Mark as Served
-                    </button>
-                </article>
-            </div>
+            <div class="orders-list" id="cookingList"></div>
         </section>
     </main>
 
     <script>
-        // Update current time
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: true 
-            });
-            document.getElementById('currentTime').textContent = timeString;
+        // Clock
+        setInterval(() => {
+            document.getElementById('currentTime').textContent = new Date().toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',hour12:true});
+        }, 1000);
+
+        // Polling loop
+        function fetchOrders() {
+            fetch('/api/orders/active')
+                .then(res => res.json())
+                .then(data => renderOrders(data))
+                .catch(err => console.error(err));
         }
-        updateTime();
-        setInterval(updateTime, 1000);
+        setInterval(fetchOrders, 3000);
+        fetchOrders();
 
-        // Add click handlers for order actions
-        document.querySelectorAll('.btn-start').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.closest('.order-card').classList.add('moving');
-                setTimeout(() => {
-                    showNotification('Order moved to Preparing!');
-                }, 500);
-            });
-        });
+        function renderOrders(orders) {
+            const placed = orders.filter(o => o.status === 'PLACED');
+            const cooking = orders.filter(o => o.status === 'COOKING');
 
-        document.querySelectorAll('.btn-complete').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.closest('.order-card').classList.add('moving');
-                setTimeout(() => {
-                    showNotification('Order is ready to serve!');
-                }, 500);
-            });
-        });
+            document.getElementById('placedList').innerHTML = placed.map(o => buildCard(o, 'COOKING', 'Start Preparing', 'fas fa-play')).join('');
+            document.getElementById('cookingList').innerHTML = cooking.map(o => buildCard(o, 'READY', 'Mark as Ready', 'fas fa-check')).join('');
+        }
 
-        document.querySelectorAll('.btn-served').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const card = this.closest('.order-card');
-                card.style.animation = 'slideOutRight 0.5s ease forwards';
-                setTimeout(() => {
-                    showNotification('Order marked as served!');
-                }, 500);
-            });
-        });
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification-toast';
-            notification.innerHTML = `<i class="fas fa-check-circle me-2"></i>${message}`;
-            document.body.appendChild(notification);
+        function buildCard(order, nextStatus, btnText, btnIcon) {
+            let itemsHtml = order.items.map(i => `
+                <div class="order-item">
+                    <span class="item-qty">${i.quantity}x</span>
+                    <span class="item-name">${i.foodItem.name}</span>
+                </div>
+            `).join('');
             
-            setTimeout(() => notification.classList.add('show'), 100);
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
+            return `
+            <article class="order-card order-new">
+                <div class="order-header">
+                    <div class="order-number">#${order.id}</div>
+                </div>
+                <div class="order-items">${itemsHtml}</div>
+                <div class="order-meta">
+                    <span class="table-info"><i class="fas fa-chair"></i> Table ${order.tableNumber}</span>
+                </div>
+                <button class="btn-order-action btn-start" onclick="updateStatus(${order.id}, '${nextStatus}')">
+                    <i class="${btnIcon}"></i> ${btnText}
+                </button>
+            </article>`;
+        }
+
+        function updateStatus(id, status) {
+            fetch(`/api/orders/${id}/status`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            }).then(() => fetchOrders());
         }
     </script>
 </body>
