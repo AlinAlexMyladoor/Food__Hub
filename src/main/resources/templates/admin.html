@@ -24,17 +24,17 @@
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
+            <a href="#orders" class="nav-link">
+                <i class="fas fa-clipboard-list"></i>
+                <span>Live Orders & Bills</span>
+            </a>
             <a href="#menu" class="nav-link">
                 <i class="fas fa-utensils"></i>
-                <span>Menu Management</span>
-            </a>
-            <a href="#orders" class="nav-link">
-                <i class="fas fa-shopping-bag"></i>
-                <span>Order History</span>
+                <span>Menu Repository</span>
             </a>
             <a href="#staff" class="nav-link">
-                <i class="fas fa-users"></i>
-                <span>Staff Management</span>
+                <i class="fas fa-users-cog"></i>
+                <span>Staff Control</span>
             </a>
         </nav>
         
@@ -54,7 +54,7 @@
             </div>
             <div class="navbar-right">
                 <div class="user-profile">
-                    <img src="https://i.pravatar.cc/40" alt="Admin">
+                    <span class="fw-bold text-dark"><i class="fas fa-user-shield me-2"></i>Admin</span>
                 </div>
             </div>
         </header>
@@ -63,7 +63,7 @@
             <!-- Stats Cards -->
             <div class="stats-grid" id="dashboard">
                 <div class="stat-card stat-gradient-1">
-                    <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
                     <div class="stat-info">
                         <h4>Total Sales</h4>
                         <h2 class="counter text-white" th:text="'₹' + ${totalSales}">₹0</h2>
@@ -141,11 +141,12 @@
                                 <td th:text="${f.id}"></td>
                                 <td th:text="${f.name}"></td>
                                 <td th:text="${f.category}"></td>
-                                <td th:text="${f.veg ? 'Veg' : 'Non-Veg'}"></td>
-                                <td th:text="${f.available ? 'Available' : 'Out of Stock'}"></td>
+                                <td th:text="${f.isVeg() ? 'Veg' : 'Non-Veg'}"></td>
+                                <td th:text="${f.isAvailable() ? 'Available' : 'Out of Stock'}"></td>
                                 <td th:text="'₹' + ${f.price}"></td>
                                 <td>
                                     <div class="action-buttons">
+                                        <button class="btn-action bg-warning text-dark border-0 me-2 edit-food-btn" th:data-id="${f.id}" th:data-name="${f.name}" th:data-category="${f.category}" th:data-price="${f.price}" th:data-image="${f.imageUrl}" th:data-veg="${f.isVeg()}" th:data-available="${f.isAvailable()}"><i class="fas fa-edit"></i></button>
                                         <a th:href="@{'/admin/delete-food/' + ${f.id}}" class="btn-action btn-delete"><i class="fas fa-trash-alt"></i></a>
                                     </div>
                                 </td>
@@ -261,6 +262,71 @@
       </div>
     </div>
 
+    <!-- Edit Food Modal -->
+    <div class="modal fade" id="editFoodModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content text-dark">
+          <form th:action="@{/admin/update-food}" method="post">
+              <input type="hidden" name="id" id="editFoodId">
+              <div class="modal-header bg-warning">
+                <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Food Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                    <label>Name</label>
+                    <input type="text" name="name" id="editFoodName" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Category</label>
+                    <input type="text" name="category" id="editFoodCategory" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Price (₹)</label>
+                    <input type="number" step="0.01" name="price" id="editFoodPrice" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label>Image URL</label>
+                    <input type="text" name="imageUrl" id="editFoodImageUrl" class="form-control">
+                </div>
+                <div class="form-check form-switch mb-2">
+                  <input class="form-check-input" type="checkbox" name="veg" id="editFoodVeg">
+                  <label class="form-check-label">Is Veg?</label>
+                </div>
+                <div class="form-check form-switch">
+                  <input class="form-check-input" type="checkbox" name="available" id="editFoodAvailable">
+                  <label class="form-check-label">Available?</label>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-dark w-100 fw-bold">Update Food Item</button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.sidebar-nav .nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.edit-food-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('editFoodId').value = this.dataset.id;
+                document.getElementById('editFoodName').value = this.dataset.name;
+                document.getElementById('editFoodCategory').value = this.dataset.category;
+                document.getElementById('editFoodPrice').value = this.dataset.price;
+                document.getElementById('editFoodImageUrl').value = this.dataset.image;
+                document.getElementById('editFoodVeg').checked = this.dataset.veg === 'true';
+                document.getElementById('editFoodAvailable').checked = this.dataset.available === 'true';
+                new bootstrap.Modal(document.getElementById('editFoodModal')).show();
+            });
+        });
+    </script>
 </body>
 </html>

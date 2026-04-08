@@ -38,7 +38,7 @@ public class LoginController {
             session.setAttribute("loggedInUser", user);
             
             return switch (user.getRole().toUpperCase()) {
-                case "ADMIN"    -> "redirect:/admin-dashboard";
+                case "ADMIN"    -> "redirect:/admin/dashboard";
                 case "CUSTOMER" -> "redirect:/menu";
                 case "KITCHEN"  -> "redirect:/kitchen-orders";
                 case "WAITER"   -> "redirect:/waiter-dashboard";

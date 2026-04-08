@@ -70,6 +70,21 @@ public class AdminController {
         return "redirect:/admin/dashboard";
     }
 
+    @PostMapping("/update-food")
+    public String updateFood(@ModelAttribute FoodItem food) {
+        FoodItem existing = foodItemRepository.findById(food.getId()).orElse(null);
+        if (existing != null) {
+            existing.setName(food.getName());
+            existing.setCategory(food.getCategory());
+            existing.setPrice(food.getPrice());
+            existing.setImageUrl(food.getImageUrl());
+            existing.setVeg(food.isVeg());
+            existing.setAvailable(food.isAvailable());
+            foodItemRepository.save(existing);
+        }
+        return "redirect:/admin/dashboard";
+    }
+
     @GetMapping("/delete-food/{id}")
     public String deleteFood(@PathVariable Long id) {
         foodItemRepository.deleteById(id);

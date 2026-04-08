@@ -12,11 +12,6 @@ public class MenuController {
         return "menu"; // Looks for menu.html
     }
 
-    // For Admins
-    @GetMapping("/admin-dashboard")
-    public String showAdmin() {
-        return "admin"; // Looks for admin.html
-    }
 
     // For Kitchen Staff
     @GetMapping("/kitchen-orders")
