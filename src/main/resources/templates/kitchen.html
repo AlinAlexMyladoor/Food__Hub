@@ -56,12 +56,23 @@
         setInterval(fetchOrders, 3000);
         fetchOrders();
 
+        let lastPlaced = '';
+        let lastCooking = '';
         function renderOrders(orders) {
             const placed = orders.filter(o => o.status === 'PLACED');
             const cooking = orders.filter(o => o.status === 'COOKING');
 
-            document.getElementById('placedList').innerHTML = placed.map(o => buildCard(o, 'COOKING', 'Start Preparing', 'fas fa-play')).join('');
-            document.getElementById('cookingList').innerHTML = cooking.map(o => buildCard(o, 'READY', 'Mark as Ready', 'fas fa-check')).join('');
+            const newPlaced = placed.map(o => buildCard(o, 'COOKING', 'Start Preparing', 'fas fa-play')).join('');
+            if (lastPlaced !== newPlaced) {
+                document.getElementById('placedList').innerHTML = newPlaced;
+                lastPlaced = newPlaced;
+            }
+
+            const newCooking = cooking.map(o => buildCard(o, 'READY', 'Mark as Ready', 'fas fa-check')).join('');
+            if (lastCooking !== newCooking) {
+                document.getElementById('cookingList').innerHTML = newCooking;
+                lastCooking = newCooking;
+            }
         }
 
         function buildCard(order, nextStatus, btnText, btnIcon) {

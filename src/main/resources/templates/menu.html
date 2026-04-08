@@ -121,7 +121,7 @@
                     <i class="fas fa-receipt fs-5"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" id="activeOrderBadge" style="display:none; font-size: 0.7rem;">0</span>
                 </button>
-                <button class="btn-call-waiter ms-2 shadow-sm" onclick="callWaiter()" title="Call Waiter for Assistance">
+                <button class="btn-call-waiter ms-2 shadow-sm" id="assistanceBtn" onclick="callWaiter()" title="Call Waiter for Assistance">
                     <i class="fas fa-bell fs-5 me-2"></i> Need Help?
                 </button>
                 <div class="table-selector ms-3 me-2">
@@ -625,6 +625,13 @@
                 
                 setTimeout(() => tableModalInst.hide(), 150);
                 showNotification(`Assigned to Table ${tableNumber}`);
+
+                fetch('/api/waiter/calls/status/' + tableNumber)
+                .then(r => r.json())
+                .then(data => {
+                    updateAssistanceUI(data.pending);
+                    if (data.pending) startCallPolling();
+                });
             }
         }
 
@@ -691,6 +698,8 @@
             .catch(e => showNotification("Network error."));
         }
 
+        let callPollingInterval = null;
+
         function callWaiter() {
             if(!selectedTable) {
                 showNotification("Please select your Table first.");
@@ -706,11 +715,45 @@
             .then(res => {
                 if(res.ok) {
                     showNotification("🛎️ A Waiter has been called to your table!");
+                    updateAssistanceUI(true);
+                    startCallPolling();
                 } else {
                     showNotification("Could not reach waiter system.");
                 }
             })
             .catch(e => showNotification("Network error."));
+        }
+
+        function updateAssistanceUI(isPending) {
+            const btn = document.getElementById('assistanceBtn');
+            if (isPending) {
+                btn.style.background = '#ffc107'; 
+                btn.style.color = '#000';
+                btn.style.borderColor = '#ffc107';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin fs-5 me-2"></i> Waiter on the way...';
+            } else {
+                btn.style.background = '#fff';
+                btn.style.color = 'var(--accent-primary)';
+                btn.style.borderColor = '#eaeaea';
+                btn.innerHTML = '<i class="fas fa-bell fs-5 me-2"></i> Need Help?';
+            }
+        }
+
+        function startCallPolling() {
+            if (callPollingInterval) return;
+            callPollingInterval = setInterval(() => {
+                if (!selectedTable) return;
+                fetch('/api/waiter/calls/status/' + selectedTable)
+                .then(r => r.json())
+                .then(data => {
+                    updateAssistanceUI(data.pending);
+                    if (!data.pending) {
+                        clearInterval(callPollingInterval);
+                        callPollingInterval = null;
+                        showNotification("✅ Assistant request resolved by Waiter!");
+                    }
+                });
+            }, 3000);
         }
 
         function toggleOrders(forceOpen) {

@@ -18,23 +18,27 @@
             <div class="time-badge"><i class="far fa-clock me-2"></i><span id="currentTime"></span></div>
         </div>
         <div class="header-right">
-            <a th:href="@{/logout}" class="btn-logout-inline"><i class="fas fa-sign-out-alt"></i></a>
+            <a th:href="@{/logout}" class="btn btn-outline-danger fw-bold shadow-sm px-4 rounded-pill border-2" style="background:#fff;"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
         </div>
     </header>
 
-    <main class="kitchen-container" id="kanban-board">
-        <section class="order-column w-50 pe-3" style="min-width: 400px;">
-            <div class="column-header column-ready">
-                <i class="fas fa-check-circle"></i>
-                <h3>Ready to Serve</h3>
+    <main class="container d-flex justify-content-center align-items-start mt-5 gap-5" id="kanban-board" style="max-width: 1200px;">
+        <section class="order-column w-50" style="min-width: 450px; max-width: 550px;">
+            <div class="p-3 bg-white rounded-3 shadow-sm border-start border-success border-5 d-flex align-items-center mb-4">
+                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width:45px; height:45px;">
+                    <i class="fas fa-check-circle fs-5"></i>
+                </div>
+                <h3 class="m-0 fw-bold text-dark fs-4">Ready to Serve</h3>
             </div>
             <div class="orders-list" id="readyList"></div>
         </section>
 
-        <section class="order-column w-50 ps-3 border-start" style="min-width: 400px;">
-            <div class="column-header" style="background:#fff3cd; color:#856404; border: 1px solid #ffeeba;">
-                <i class="fas fa-bell"></i>
-                <h3>Needs Assistance</h3>
+        <section class="order-column w-50" style="min-width: 450px; max-width: 550px;">
+            <div class="p-3 bg-white rounded-3 shadow-sm border-start border-danger border-5 d-flex align-items-center mb-4">
+                <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width:45px; height:45px;">
+                    <i class="fas fa-bell fs-5"></i>
+                </div>
+                <h3 class="m-0 fw-bold text-dark fs-4">Needs Assistance</h3>
             </div>
             <div class="orders-list" id="callsList"></div>
         </section>
@@ -60,58 +64,92 @@
         setInterval(fetchOrders, 3000);
         fetchOrders();
 
+        function timeAgo(dateString) {
+            if (!dateString) return "Unknown time";
+            
+            // Add 'Z' to treat the local ISO without timezone as UTC if backend sends UTC, 
+            // but Spring Boot's default local datetime usually responds local. 
+            // Let's parse exactly.
+            let date = new Date(dateString);
+            if (isNaN(date.getTime())) return "Just now";
+
+            const seconds = Math.floor((new Date() - date) / 1000);
+            
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return minutes + 'm ago';
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return hours + 'h ago';
+            return Math.floor(hours / 24) + 'd ago';
+        }
+
+        let lastCallsHtml = '';
         function renderCalls(calls) {
-            document.getElementById('callsList').innerHTML = calls.map(c => `
-                <article class="order-card shadow-sm" style="background: #fff8f8; border: 2px solid #ff4d4f; animation: pulse-border 2s infinite;">
-                    <div class="order-header">
-                        <div class="order-number text-danger"><i class="fas fa-exclamation-triangle"></i> Table ${c.tableNumber}</div>
+            const newHtml = calls.map(c => `
+                <article class="order-card shadow-sm" style="background: #fffafa; border-left: 4px solid #dc3545; border-radius: 8px;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="order-number text-danger fw-bold fs-5">
+                            <i class="fas fa-bell fa-shake"></i> Table ${c.tableNumber}
+                        </div>
+                        <span class="badge bg-danger rounded-pill px-2 py-1">
+                            <i class="fas fa-clock fs-6"></i> ${timeAgo(c.createdAt)}
+                        </span>
                     </div>
-                    <div class="order-items my-3 text-dark fw-bold text-center">
-                        Guest requested assistance.
+                    <div class="my-2 text-dark small">
+                        Please proceed to Table ${c.tableNumber} immediately for guest assistance.
                     </div>
-                    <div class="order-meta text-muted small">
-                        <i class="fas fa-clock"></i> Called at: ${new Date(c.createdAt).toLocaleTimeString()}
-                    </div>
-                    <button class="btn-order-action mt-3 border-0 w-100" style="background: #ff4d4f; color: white;" onclick="resolveCall(${c.id})">
-                        <i class="fas fa-check"></i> Mark Resolved
+                    <button class="btn btn-outline-danger btn-sm mt-2 w-100 fw-bold" onclick="resolveCall(${c.id})">
+                        <i class="fas fa-check-circle me-1"></i> Resolve Request
                     </button>
                 </article>
             `).join('');
+            if (lastCallsHtml !== newHtml) {
+                document.getElementById('callsList').innerHTML = newHtml;
+                lastCallsHtml = newHtml;
+            }
         }
 
         function resolveCall(id) {
-            fetch(\`/api/waiter/calls/\${id}/resolve\`, { method: 'POST' }).then(() => fetchOrders());
+            fetch('/api/waiter/calls/' + id + '/resolve', { method: 'POST' }).then(() => fetchOrders());
         }
 
+        let lastOrdersHtml = '';
         function renderOrders(orders) {
-            document.getElementById('readyList').innerHTML = orders.map(o => buildCard(o, 'SERVED', 'Mark as Served', 'fas fa-utensils')).join('');
+            const newHtml = orders.map(o => buildCard(o, 'SERVED', 'Mark as Served', 'fas fa-utensils')).join('');
+            if (lastOrdersHtml !== newHtml) {
+                document.getElementById('readyList').innerHTML = newHtml;
+                lastOrdersHtml = newHtml;
+            }
         }
 
         function buildCard(order, nextStatus, btnText, btnIcon) {
             let itemsHtml = order.items.map(i => `
-                <div class="order-item">
-                    <span class="item-qty">${i.quantity}x</span>
-                    <span class="item-name">${i.foodItem.name}</span>
+                <div class="d-flex justify-content-between align-items-center mb-1 pb-1 border-bottom border-light">
+                    <span class="fw-bold text-dark"><span class="badge bg-secondary me-2">${i.quantity}x</span>${i.foodItem.name}</span>
                 </div>
             `).join('');
             
             return `
-            <article class="order-card order-ready">
-                <div class="order-header">
-                    <div class="order-number">#${order.id}</div>
+            <article class="order-card shadow-sm mb-3" style="background: #f8fdf8; border-left: 4px solid #198754; border-radius: 8px; padding: 15px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="order-number text-success fw-bold fs-5">
+                        <i class="fas fa-receipt me-1"></i> Order #${order.id}
+                    </div>
+                    <span class="badge bg-success rounded-pill px-3 py-2 fs-6">
+                        <i class="fas fa-chair me-1"></i> Table ${order.tableNumber}
+                    </span>
                 </div>
-                <div class="order-items">${itemsHtml}</div>
-                <div class="order-meta">
-                    <span class="table-info"><i class="fas fa-chair"></i> Table ${order.tableNumber}</span>
+                <div class="order-items bg-white rounded p-2 shadow-sm mb-3" style="max-height: 150px; overflow-y: auto;">
+                    ${itemsHtml}
                 </div>
-                <button class="btn-order-action btn-served" onclick="updateStatus(${order.id}, '${nextStatus}')">
-                    <i class="${btnIcon}"></i> ${btnText}
+                <button class="btn btn-success w-100 fw-bold shadow-sm" onclick="updateStatus(${order.id}, '${nextStatus}')">
+                    <i class="${btnIcon} me-2"></i> ${btnText}
                 </button>
             </article>`;
         }
 
         function updateStatus(id, status) {
-            fetch(`/api/orders/${id}/status`, {
+            fetch('/api/orders/' + id + '/status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ status })

@@ -118,6 +118,10 @@ public class ApiController {
         Integer tableNumber = payload.get("tableNumber");
         if (tableNumber == null) return ResponseEntity.badRequest().build();
         
+        boolean alreadyPending = waiterCallRepository.findByStatusOrderByCreatedAtAsc("PENDING")
+            .stream().anyMatch(c -> c.getTableNumber().equals(tableNumber));
+        if (alreadyPending) return ResponseEntity.ok(Map.of("message", "Already requested"));
+
         WaiterCall call = new WaiterCall();
         call.setTableNumber(tableNumber);
         waiterCallRepository.save(call);
@@ -127,6 +131,13 @@ public class ApiController {
     @GetMapping("/waiter/calls")
     public List<WaiterCall> getActiveWaiterCalls() {
         return waiterCallRepository.findByStatusOrderByCreatedAtAsc("PENDING");
+    }
+
+    @GetMapping("/waiter/calls/status/{tableNumber}")
+    public ResponseEntity<Map<String, Boolean>> checkWaiterCallStatus(@PathVariable Integer tableNumber) {
+        boolean pending = waiterCallRepository.findByStatusOrderByCreatedAtAsc("PENDING")
+            .stream().anyMatch(c -> c.getTableNumber().equals(tableNumber));
+        return ResponseEntity.ok(Map.of("pending", pending));
     }
 
     @PostMapping("/waiter/calls/{id}/resolve")
