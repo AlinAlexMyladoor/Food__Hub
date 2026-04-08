@@ -12,4 +12,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStatusIn(List<String> statuses);
     List<Order> findByStatusOrderByCreatedAtDesc(String status);
     List<Order> findAllByOrderByCreatedAtDesc();
+    
+    // To grab active orders for a customer (anything not PAID or SERVED beyond tracking)
+    List<Order> findByCustomerUsernameAndStatusIn(String customerUsername, List<String> statuses);
 }

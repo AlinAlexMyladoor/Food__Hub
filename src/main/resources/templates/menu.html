@@ -72,6 +72,15 @@
         .feedback-stars i { font-size: 2.5rem; color: #ddd; cursor: pointer; transition: 0.2s; margin: 0 5px; }
         .feedback-stars i:hover, .feedback-stars i.active { color: #FFD700; transform: scale(1.1); }
 
+        /* Out of Stock Styling */
+        .sold-out-card { filter: grayscale(1); opacity: 0.8; pointer-events: none; position: relative; }
+        .sold-out-badge { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: rgba(217, 4, 41, 0.9); color: white; padding: 10px 40px; font-weight: 900; font-size: 1.5rem; text-transform: uppercase; border: 3px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 5; letter-spacing: 2px; }
+
+        /* Waiter Call Pulse */
+        @keyframes pulse-waiter { 0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); } }
+        .btn-call-waiter { border: 1px solid #ffdca8; background: #fffdf5; color: #f59f00; font-weight: bold; border-radius: 12px; height: 50px; padding: 0 15px; display: flex; align-items: center; transition: 0.3s; animation: pulse-waiter 2s infinite; }
+        .btn-call-waiter:hover { background: #f59f00; color: white !important; }
+
         @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(217, 4, 41, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(217, 4, 41, 0); } 100% { box-shadow: 0 0 0 0 rgba(217, 4, 41, 0); } }
     </style>
 </head>
@@ -108,9 +117,12 @@
                     <i class="fas fa-shopping-cart"></i>
                     <span class="cart-count">0</span>
                 </button>
-                <button class="btn ms-2 position-relative shadow-sm d-flex align-items-center justify-content-center" style="background:#fff; border: 1px solid #eaeaea; border-radius:12px; width:50px; height:50px; color:var(--accent-primary);" onclick="toggleOrders()">
+                <button class="btn ms-2 position-relative shadow-sm d-flex align-items-center justify-content-center" style="background:#fff; border: 1px solid #eaeaea; border-radius:12px; width:50px; height:50px; color:var(--accent-primary);" onclick="toggleOrders()" title="My Orders">
                     <i class="fas fa-receipt fs-5"></i>
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success" id="activeOrderBadge" style="display:none; font-size: 0.7rem;">0</span>
+                </button>
+                <button class="btn-call-waiter ms-2 shadow-sm" onclick="callWaiter()" title="Call Waiter for Assistance">
+                    <i class="fas fa-bell fs-5 me-2"></i> Need Help?
                 </button>
                 <div class="table-selector ms-3 me-2">
                     <button class="table-badge no-table" id="tableToggle" onclick="tableModalInst.show()" type="button">
@@ -137,12 +149,35 @@
 
             <!-- Food Menu Grid Area -->
             <main class="menu-container">
-                <!-- Hero Section inserted into main container for standard layout -->
-                <section class="hero-section text-center rounded-4 mb-5 shadow-sm" style="background: linear-gradient(135deg, #1a1a1a 0%, #434343 100%); padding: 50px 30px; position: relative; overflow: hidden; color: white;">
-                    <div style="position: absolute; top:-50px; right: -50px; opacity: 0.1;"><i class="fas fa-hamburger fa-10x"></i></div>
-                    <h1 class="fw-bolder mb-3" style="font-size: 3rem;">Discover Your <span style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Favorite</span> Meals</h1>
-                    <p class="fs-5 text-light opacity-75 mb-0">Browse our rich categories, pick your table, and enjoy the culinary experience!</p>
-                </section>
+                <!-- Dynamic Deals Carousel Banner -->
+                <div id="heroCarousel" class="carousel slide mb-5 shadow-sm rounded-4 overflow-hidden" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div class="d-flex align-items-center justify-content-center text-center p-5" style="background: linear-gradient(135deg, #1a1a1a 0%, #434343 100%); min-height: 250px; color: white;">
+                                <div>
+                                    <h1 class="fw-bolder mb-2" style="font-size: 2.8rem;">Discover Your <span style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Favorite</span> Meals</h1>
+                                    <p class="fs-5 text-light opacity-75 mb-0">Browse our rich categories and enjoy the culinary experience!</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="d-flex align-items-center justify-content-center text-center p-5" style="background: linear-gradient(135deg, #d32f2f 0%, #ff5252 100%); min-height: 250px; color: white;">
+                                <div>
+                                    <h1 class="fw-bolder mb-2" style="font-size: 2.8rem;">Spicy Weekend <span class="text-warning">Combo!</span></h1>
+                                    <p class="fs-5 text-light opacity-80 mb-0">Get 15% off all Non-Veg Family Packs today.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="d-flex align-items-center justify-content-center text-center p-5" style="background: linear-gradient(135deg, #2e7d32 0%, #4caf50 100%); min-height: 250px; color: white;">
+                                <div>
+                                    <h1 class="fw-bolder mb-2" style="font-size: 2.8rem;">Fresh & healthy <span class="text-warning">Diet Eats</span></h1>
+                                    <p class="fs-5 text-light opacity-80 mb-0">Explore our brand new organic Salad category.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h3 class="fw-bolder text-dark mb-0"><span id="currentCategoryTitle">All Items</span></h3>
@@ -252,6 +287,14 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
+        <div class="px-4 py-3 bg-white shadow-sm border-bottom" style="z-index:9; position:relative;">
+            <label class="form-label small fw-bold text-muted mb-2"><i class="fas fa-search me-1"></i>Track Existing Order</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0 text-muted fw-bold">#</span>
+                <input type="number" class="form-control border-start-0 ps-0 fw-bold" id="manualOrderId" placeholder="Order ID">
+                <button class="btn btn-outline-primary px-3 fw-bold" onclick="trackManualOrder()">Track</button>
+            </div>
+        </div>
         <div class="flex-grow-1 overflow-auto p-4" id="ordersContainer" style="background:#fafafa;">
             <div class="text-center mt-5 pt-4 opacity-50">
                 <i class="fas fa-history fa-4x mb-3 text-muted"></i>
@@ -314,7 +357,13 @@
             tableModalInst = new bootstrap.Modal(document.getElementById('tableSelectModal'));
             fetchFoodItems();
             renderCategories();
+            restoreActiveOrders();
         });
+
+        function restoreActiveOrders() {
+            // Disabled automatic loading as per requirements.
+            // Orders must be entered manually via Tracking ID if the session is reloaded.
+        }
 
         function fetchFoodItems() {
             fetch('/api/food-items')
@@ -418,10 +467,15 @@
                 const vegBadge = item.veg ? '<div class="food-badge" style="background:#e8f5e9; color:#2e7d32; border:1px solid #2e7d32; padding:4px 12px;"><i class="fas fa-leaf me-1"></i>Veg</div>' : '<div class="food-badge" style="background:#ffebee; color:#d32f2f; border:1px solid #d32f2f; padding:4px 12px;"><i class="fas fa-bone me-1"></i>Non-Veg</div>';
                 const img = item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500';
                 
+                let cardClass = item.available ? 'food-card-modern' : 'sold-out-card food-card-modern';
+                let soldOutBadge = item.available ? '' : '<div class="sold-out-badge">Sold Out</div>';
+                let actionBtn = item.available ? getActionHtml(item.id) : '<button class="btn btn-secondary disabled opacity-50 px-3"><i class="fas fa-ban"></i></button>';
+
                 html += `
-                <article class="food-card-modern bg-white" style="--delay: 0.1s; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow: hidden;">
+                <article class="${cardClass} bg-white" style="--delay: 0.1s; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow: hidden;">
                     <div class="food-image-wrapper" style="height: 200px;">
-                        <img src="${img}" alt="${item.name}" class="food-image w-100 h-100 object-fit-cover">
+                        ${soldOutBadge}
+                        <img src="${img}" alt="${item.name}" class="food-image w-100 h-100 object-fit-cover" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500';">
                         ${vegBadge}
                     </div>
                     <div class="food-content p-4 d-flex flex-column h-100">
@@ -435,7 +489,7 @@
                                 <h4 class="price text-danger mb-0 fw-black">₹${item.price.toFixed(2)}</h4>
                             </div>
                             <div id="action-container-${item.id}">
-                                ${getActionHtml(item.id)}
+                                ${actionBtn}
                             </div>
                         </div>
                     </div>
@@ -467,8 +521,8 @@
                 return;
             }
             const item = allFoodItems.find(f => f.id === id);
-            if(item) {
-                if(!cart[id]) cart[id] = { item: item, quantity: 1 };
+            if(item && item.available) {
+                if(!cart[id]) cart[id] = { item: item, quantity: 1, instructions: '' };
                 else cart[id].quantity += 1;
                 
                 showNotification(`Added ${item.name}!`);
@@ -494,6 +548,10 @@
             }
         }
 
+        function updateInst(id, val) {
+            if(cart[id]) cart[id].instructions = val;
+        }
+
         function updateCartUI() {
             const cartItemsContainer = document.getElementById('cartItems');
             let total = 0;
@@ -509,8 +567,9 @@
                         <div class="d-flex flex-column gap-1 me-auto">
                             <h6 class="fw-bolder text-dark mb-0">${c.item.name}</h6>
                             <span class="text-accent fw-bold" style="color: #ff4d6d;">₹${c.item.price.toFixed(2)}</span>
+                            <input type="text" class="form-control form-control-sm mt-1 border-0" style="background:#f9f9f9; font-size: 0.75rem; color:#666;" placeholder="Special instructions (e.g. No onions)" value="${c.instructions || ''}" onchange="updateInst(${id}, this.value)">
                         </div>
-                        <div class="d-flex align-items-center bg-light rounded-pill px-2 py-1 ms-3 border mt-2">
+                        <div class="d-flex align-items-center bg-light rounded-pill px-2 py-1 ms-3 border mt-2 align-self-end">
                             <button class="btn btn-sm btn-link text-dark text-decoration-none p-0 mx-1" onclick="updateQty(${id}, -1)">
                                 <i class="fas ${c.quantity === 1 ? 'fa-trash-alt text-danger' : 'fa-minus'} px-1"></i>
                             </button>
@@ -539,7 +598,13 @@
         }
 
         function toggleCart() {
-            document.getElementById('cartSidebar').classList.toggle('active');
+            const cartBar = document.getElementById('cartSidebar');
+            const ordersBar = document.getElementById('ordersSidebar');
+            
+            if (!cartBar.classList.contains('active')) {
+                ordersBar.classList.remove('active');
+            }
+            cartBar.classList.toggle('active');
         }
 
         // Handles selection from the Modal grid
@@ -597,7 +662,8 @@
                 tableNumber: parseInt(selectedTable),
                 items: Object.keys(cart).map(id => ({
                     foodItemId: parseInt(id),
-                    quantity: cart[id].quantity
+                    quantity: cart[id].quantity,
+                    specialInstructions: cart[id].instructions || ''
                 }))
             };
 
@@ -610,7 +676,7 @@
             .then(orderData => {
                 if(orderData.id) {
                     paymentModalInst.hide();
-                    showNotification(`Payment successful via ${method}! Order Placed.`);
+                    showNotification(`Success! Your Tracking ID is #${orderData.id}`);
                     cart = {};
                     updateCartUI();
                     renderFoodGrid(getActiveCategory());
@@ -625,13 +691,79 @@
             .catch(e => showNotification("Network error."));
         }
 
+        function callWaiter() {
+            if(!selectedTable) {
+                showNotification("Please select your Table first.");
+                tableModalInst.show();
+                return;
+            }
+            
+            fetch('/api/waiter/call', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tableNumber: parseInt(selectedTable) })
+            })
+            .then(res => {
+                if(res.ok) {
+                    showNotification("🛎️ A Waiter has been called to your table!");
+                } else {
+                    showNotification("Could not reach waiter system.");
+                }
+            })
+            .catch(e => showNotification("Network error."));
+        }
+
         function toggleOrders(forceOpen) {
             const sidebar = document.getElementById('ordersSidebar');
+            const cartBar = document.getElementById('cartSidebar');
+            
             if (forceOpen === true) {
                 sidebar.classList.add('active');
+                cartBar.classList.remove('active');
             } else {
+                if (!sidebar.classList.contains('active')) {
+                    cartBar.classList.remove('active');
+                }
                 sidebar.classList.toggle('active');
             }
+        }
+
+        function trackManualOrder() {
+            const val = document.getElementById('manualOrderId').value;
+            if(!val) return;
+            const id = parseInt(val);
+            
+            if(!selectedTable) {
+                showNotification("Please select your Table first!");
+                tableModalInst.show();
+                return;
+            }
+            
+            if(activeOrders.some(o => o.id === id)) {
+                showNotification(`Already tracking Order #${id}`);
+                document.getElementById('manualOrderId').value = '';
+                return;
+            }
+            
+            fetch(`/api/orders/${id}`)
+            .then(r => r.ok ? r.json() : null)
+            .then(order => {
+                if(!order || order.status === 'COMMLETED') {
+                    showNotification(`Tracking ID #${id} not found.`);
+                    return;
+                }
+                
+                // Security Check: Table number must match
+                if(order.tableNumber !== parseInt(selectedTable)) {
+                    showNotification(`Invalid Tracking ID.`);
+                    return;
+                }
+                
+                showNotification(`Found Tracking ID #${id}! Monitoring status.`);
+                document.getElementById('manualOrderId').value = '';
+                trackNewOrder(order);
+            })
+            .catch(e => showNotification(`Error tracking order.`));
         }
 
         function trackNewOrder(order) {
@@ -639,6 +771,7 @@
             const badge = document.getElementById('activeOrderBadge');
             badge.style.display = 'block';
             badge.textContent = activeOrders.length;
+            
             renderOrdersUI();
             
             if(!pollingInterval) {
@@ -687,14 +820,16 @@
                 const s4 = (o.status==='SERVED') ? 'active' : '';
 
                 let feedbackBtn = '';
+                let printBtn = '';
                 if(o.status === 'SERVED') {
-                    feedbackBtn = `<button class="btn btn-outline-success w-100 mt-4 rounded-pill fw-bold" onclick="openFeedback(${o.id})"><i class="fas fa-star me-2 mb-1 text-warning"></i> Leave Feedback & Complete</button>`;
+                    printBtn = `<button class="btn btn-dark w-100 mt-2 mb-2 rounded-pill fw-bold" onclick="printReceipt(${o.id})"><i class="fas fa-print me-2 mb-1"></i> Print / Download Receipt</button>`;
+                    feedbackBtn = `<button class="btn btn-outline-success w-100 mt-2 rounded-pill fw-bold" onclick="openFeedback(${o.id})"><i class="fas fa-star me-2 mb-1 text-warning"></i> Leave Feedback & Complete</button>`;
                 }
 
                 html += `
                     <div class="order-card" id="tracked-order-${o.id}">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <h5 class="fw-bold mb-0 text-dark">Order #${o.id}</h5>
+                            <h5 class="fw-bold mb-0 text-dark">Tracking ID #${o.id}</h5>
                             <span class="badge bg-dark rounded-pill px-3 py-2 fs-6">₹${o.totalAmount ? o.totalAmount.toFixed(2) : '0.00'}</span>
                         </div>
                         <p class="text-muted small mb-4 fw-semibold"><i class="fas fa-clock me-1 text-primary"></i> ${new Date(o.createdAt).toLocaleTimeString()}</p>
@@ -717,6 +852,7 @@
                                 <span>Served</span>
                             </div>
                         </div>
+                        ${printBtn}
                         ${feedbackBtn}
                     </div>
                 `;
@@ -745,12 +881,54 @@
             if(feedbackModalInst) feedbackModalInst.hide();
             showNotification(`Thank you for your rating! ❤️`);
             
-            // Remove the served order from local tracking to complete it
             activeOrders = activeOrders.filter(o => o.id !== feedbackOrderId);
             const badge = document.getElementById('activeOrderBadge');
             badge.textContent = activeOrders.length;
             if(activeOrders.length === 0) badge.style.display = 'none';
+
             renderOrdersUI();
+        }
+
+        function printReceipt(id) {
+            const order = activeOrders.find(o => o.id === id);
+            if(!order) return;
+            
+            let itemsHtml = order.items.map(i => `
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <div>${i.quantity}x ${i.foodItem.name} ${i.specialInstructions ? '<br><small>('+i.specialInstructions+')</small>' : ''}</div>
+                    <div>₹${(i.price * i.quantity).toFixed(2)}</div>
+                </div>
+            `).join('');
+
+            const receiptHtml = `
+            <html><head><title>Receipt - Order #${order.id}</title>
+            <style>
+                body { font-family: monospace; width: 300px; margin: 0 auto; color: #000; padding: 20px; }
+                h1 { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; }
+                .amount-total { border-top: 1px dashed #000; padding-top: 10px; font-weight: bold; font-size: 1.2rem; display: flex; justify-content: space-between; margin-top: 20px;}
+            </style>
+            </head><body>
+                <h1>FoodHub</h1>
+                <p>Table: ${order.tableNumber}<br>Tracking ID: #${order.id}<br>Time: ${new Date(order.createdAt).toLocaleString()}</p>
+                <div style="margin-top:20px;">
+                    ${itemsHtml}
+                </div>
+                <div class="amount-total">
+                    <span>TOTAL:</span>
+                    <span>₹${order.totalAmount.toFixed(2)}</span>
+                </div>
+                <p style="text-align:center; margin-top:30px;">Thank you for dining with us!</p>
+            </body></html>
+            `;
+            
+            const printWindow = window.open('', '', 'width=400,height=600');
+            printWindow.document.write(receiptHtml);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 500);
         }
     </script>
 </body>

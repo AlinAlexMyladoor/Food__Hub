@@ -16,6 +16,8 @@ public class Order {
 
     private Integer tableNumber;
     
+    private String customerUsername;
+    
     // Status can be: PLACED, COOKING, READY, SERVED, PAID
     private String status = "PLACED";
     

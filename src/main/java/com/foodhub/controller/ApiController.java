@@ -3,12 +3,17 @@ package com.foodhub.controller;
 import com.foodhub.model.FoodItem;
 import com.foodhub.model.Order;
 import com.foodhub.model.OrderItem;
+import com.foodhub.model.User;
+import com.foodhub.model.WaiterCall;
 import com.foodhub.repository.FoodItemRepository;
 import com.foodhub.repository.OrderRepository;
+import com.foodhub.repository.WaiterCallRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,16 +27,24 @@ public class ApiController {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private WaiterCallRepository waiterCallRepository;
+
     @GetMapping("/food-items")
     public List<FoodItem> getAvailableFoodItems() {
-        return foodItemRepository.findAll().stream().filter(FoodItem::isAvailable).toList();
+        return foodItemRepository.findAll();
     }
 
     @PostMapping("/orders")
-    public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest) {
+    public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest, HttpSession session) {
         Order order = new Order();
         order.setTableNumber(orderRequest.getTableNumber());
         order.setStatus("PLACED");
+        
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser != null) {
+            order.setCustomerUsername(loggedInUser.getUsername());
+        }
         
         double total = 0;
         
@@ -44,6 +57,11 @@ public class ApiController {
                 orderItem.setQuantity(itemReq.getQuantity());
                 orderItem.setPrice(foodItem.getPrice()); // Lock in the price
                 
+                // Set special cooking instructions if provided
+                if(itemReq.getSpecialInstructions() != null && !itemReq.getSpecialInstructions().trim().isEmpty()) {
+                    orderItem.setSpecialInstructions(itemReq.getSpecialInstructions().trim());
+                }
+                
                 order.getItems().add(orderItem);
                 total += (foodItem.getPrice() * itemReq.getQuantity());
             }
@@ -53,6 +71,18 @@ public class ApiController {
         Order savedOrder = orderRepository.save(order);
         
         return ResponseEntity.ok(savedOrder);
+    }
+    
+    @GetMapping("/orders/my-active")
+    public List<Order> getMyActiveOrders(HttpSession session) {
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) return new ArrayList<>(); // Empty list if guest via direct API
+        
+        // Active orders are PLACED, COOKING, READY, SERVED. (We stop tracking them after SERVED feedback, or PAID in admin)
+        return orderRepository.findByCustomerUsernameAndStatusIn(
+            loggedInUser.getUsername(), 
+            List.of("PLACED", "COOKING", "READY", "SERVED")
+        );
     }
 
     @GetMapping("/orders/active")
@@ -82,6 +112,33 @@ public class ApiController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    // WAITER CALL ENDPOINTS
+    @PostMapping("/waiter/call")
+    public ResponseEntity<?> callWaiter(@RequestBody Map<String, Integer> payload) {
+        Integer tableNumber = payload.get("tableNumber");
+        if (tableNumber == null) return ResponseEntity.badRequest().build();
+        
+        WaiterCall call = new WaiterCall();
+        call.setTableNumber(tableNumber);
+        waiterCallRepository.save(call);
+        return ResponseEntity.ok(call);
+    }
+
+    @GetMapping("/waiter/calls")
+    public List<WaiterCall> getActiveWaiterCalls() {
+        return waiterCallRepository.findByStatusOrderByCreatedAtAsc("PENDING");
+    }
+
+    @PostMapping("/waiter/calls/{id}/resolve")
+    public ResponseEntity<?> resolveWaiterCall(@PathVariable Long id) {
+        return waiterCallRepository.findById(id).map(call -> {
+            call.setStatus("RESOLVED");
+            call.setResolvedAt(java.time.LocalDateTime.now());
+            waiterCallRepository.save(call);
+            return ResponseEntity.ok(call);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     // DTOs
     public static class OrderRequest {
         private Integer tableNumber;
@@ -96,10 +153,13 @@ public class ApiController {
     public static class OrderItemRequest {
         private Long foodItemId;
         private Integer quantity;
+        private String specialInstructions;
 
         public Long getFoodItemId() { return foodItemId; }
         public void setFoodItemId(Long foodItemId) { this.foodItemId = foodItemId; }
         public Integer getQuantity() { return quantity; }
         public void setQuantity(Integer quantity) { this.quantity = quantity; }
+        public String getSpecialInstructions() { return specialInstructions; }
+        public void setSpecialInstructions(String specialInstructions) { this.specialInstructions = specialInstructions; }
     }
 }

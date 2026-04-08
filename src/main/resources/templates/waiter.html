@@ -23,12 +23,20 @@
     </header>
 
     <main class="kitchen-container" id="kanban-board">
-        <section class="order-column w-100 mx-auto" style="max-width:800px;">
+        <section class="order-column w-50 pe-3" style="min-width: 400px;">
             <div class="column-header column-ready">
                 <i class="fas fa-check-circle"></i>
                 <h3>Ready to Serve</h3>
             </div>
             <div class="orders-list" id="readyList"></div>
+        </section>
+
+        <section class="order-column w-50 ps-3 border-start" style="min-width: 400px;">
+            <div class="column-header" style="background:#fff3cd; color:#856404; border: 1px solid #ffeeba;">
+                <i class="fas fa-bell"></i>
+                <h3>Needs Assistance</h3>
+            </div>
+            <div class="orders-list" id="callsList"></div>
         </section>
     </main>
 
@@ -43,9 +51,37 @@
                 .then(res => res.json())
                 .then(data => renderOrders(data))
                 .catch(err => console.error(err));
+                
+            fetch('/api/waiter/calls')
+                .then(res => res.json())
+                .then(data => renderCalls(data))
+                .catch(err => console.error(err));
         }
         setInterval(fetchOrders, 3000);
         fetchOrders();
+
+        function renderCalls(calls) {
+            document.getElementById('callsList').innerHTML = calls.map(c => `
+                <article class="order-card shadow-sm" style="background: #fff8f8; border: 2px solid #ff4d4f; animation: pulse-border 2s infinite;">
+                    <div class="order-header">
+                        <div class="order-number text-danger"><i class="fas fa-exclamation-triangle"></i> Table ${c.tableNumber}</div>
+                    </div>
+                    <div class="order-items my-3 text-dark fw-bold text-center">
+                        Guest requested assistance.
+                    </div>
+                    <div class="order-meta text-muted small">
+                        <i class="fas fa-clock"></i> Called at: ${new Date(c.createdAt).toLocaleTimeString()}
+                    </div>
+                    <button class="btn-order-action mt-3 border-0 w-100" style="background: #ff4d4f; color: white;" onclick="resolveCall(${c.id})">
+                        <i class="fas fa-check"></i> Mark Resolved
+                    </button>
+                </article>
+            `).join('');
+        }
+
+        function resolveCall(id) {
+            fetch(\`/api/waiter/calls/\${id}/resolve\`, { method: 'POST' }).then(() => fetchOrders());
+        }
 
         function renderOrders(orders) {
             document.getElementById('readyList').innerHTML = orders.map(o => buildCard(o, 'SERVED', 'Mark as Served', 'fas fa-utensils')).join('');

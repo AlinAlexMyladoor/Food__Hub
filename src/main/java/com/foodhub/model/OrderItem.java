@@ -23,4 +23,5 @@ public class OrderItem {
 
     private Integer quantity;
     private double price; // Price at the time of order
+    private String specialInstructions;
 }

@@ -66,9 +66,12 @@
 
         function buildCard(order, nextStatus, btnText, btnIcon) {
             let itemsHtml = order.items.map(i => `
-                <div class="order-item">
-                    <span class="item-qty">${i.quantity}x</span>
-                    <span class="item-name">${i.foodItem.name}</span>
+                <div class="order-item" style="display:flex; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between;">
+                        <span class="item-qty">${i.quantity}x</span>
+                        <span class="item-name">${i.foodItem.name}</span>
+                    </div>
+                    ${i.specialInstructions ? `<div class="badge bg-warning text-dark mt-1 text-wrap text-start" style="font-size:0.75rem;"><i class="fas fa-exclamation-triangle"></i> Note: ${i.specialInstructions}</div>` : ''}
                 </div>
             `).join('');
             
