@@ -10,7 +10,6 @@
 </head>
 <body class="admin-body">
     
-    <!-- Modern Sidebar -->
     <div class="modern-sidebar">
         <div class="sidebar-header">
             <h3 class="logo-gradient">
@@ -36,6 +35,15 @@
                 <i class="fas fa-users-cog"></i>
                 <span>Staff Control</span>
             </a>
+            <a href="#categories" class="nav-link">
+                <i class="fas fa-layer-group"></i>
+                <span>Categories</span>
+            </a>
+            
+            <a href="#feedback" class="nav-link">
+                <i class="fas fa-star text-warning"></i>
+                <span>Customer Feedback</span>
+            </a>
         </nav>
         
         <div class="sidebar-footer">
@@ -46,7 +54,6 @@
         </div>
     </div>
 
-    <!-- Main Content Area -->
     <div class="main-wrapper">
         <header class="top-navbar">
             <div class="navbar-left">
@@ -60,7 +67,6 @@
         </header>
 
         <main class="dashboard-content">
-            <!-- Stats Cards -->
             <div class="stats-grid" id="dashboard">
                 <div class="stat-card stat-gradient-1">
                     <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
@@ -85,7 +91,6 @@
                 </div>
             </div>
 
-            <!-- Order History -->
             <div class="content-card mt-4" id="orders">
                 <div class="card-header-flex">
                     <h3><i class="fas fa-history me-2"></i>Order History & Bills</h3>
@@ -99,6 +104,7 @@
                                 <th>Time</th>
                                 <th>Amount</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -108,19 +114,31 @@
                                 <td th:text="${#temporals.format(o.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
                                 <td th:text="'₹' + ${o.totalAmount}"></td>
                                 <td><span class="badge bg-secondary" th:text="${o.status}"></span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a class="btn-action btn-delete" th:href="@{'/admin/delete-order/' + ${o.id}}" onclick="return confirm('Delete this order forever?');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Food Items Management -->
             <div class="content-card mt-4" id="menu">
-                <div class="card-header-flex">
-                    <h3><i class="fas fa-utensils me-2"></i>Menu Items</h3>
-                    <button class="btn-primary-gradient" data-bs-toggle="modal" data-bs-target="#addFoodModal">
-                        <i class="fas fa-plus me-2"></i>Add Item
-                    </button>
+                <div class="card-header-flex d-flex justify-content-between align-items-center">
+                    <h3 class="m-0"><i class="fas fa-utensils me-2"></i>Menu Items</h3>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex align-items-center bg-light rounded-pill px-3 py-1 border">
+                            <i class="fas fa-search text-muted me-2"></i>
+                            <input type="text" id="liveMenuSearch" placeholder="Type to search..." class="form-control border-0 bg-transparent shadow-none" style="outline:none; width:200px;">
+                        </div>
+                        <button class="btn-primary-gradient" data-bs-toggle="modal" data-bs-target="#addFoodModal">
+                            <i class="fas fa-plus me-2"></i>Add Item
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="table-responsive">
@@ -136,7 +154,7 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="menuTableBody">
                             <tr th:each="f : ${allFoods}">
                                 <td th:text="${f.id}"></td>
                                 <td th:text="${f.name}"></td>
@@ -146,7 +164,13 @@
                                 <td th:text="'₹' + ${f.price}"></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="btn-action bg-warning text-dark border-0 me-2 edit-food-btn" th:data-id="${f.id}" th:data-name="${f.name}" th:data-category="${f.category}" th:data-price="${f.price}" th:data-image="${f.imageUrl}" th:data-veg="${f.isVeg()}" th:data-available="${f.isAvailable()}"><i class="fas fa-edit"></i></button>
+                                        <button class="btn-action bg-warning text-dark border-0 me-2 edit-food-btn" 
+                                            th:data-id="${f.id}" th:data-name="${f.name}" 
+                                            th:data-category="${f.category}" th:data-price="${f.price}" 
+                                            th:data-image="${f.imageUrl}" th:data-veg="${f.isVeg()}" 
+                                            th:data-available="${f.isAvailable()}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
                                         <a th:href="@{'/admin/delete-food/' + ${f.id}}" class="btn-action btn-delete"><i class="fas fa-trash-alt"></i></a>
                                     </div>
                                 </td>
@@ -156,7 +180,6 @@
                 </div>
             </div>
 
-            <!-- User Management Section -->
             <div class="content-card mt-4" id="staff">
                 <div class="card-header-flex">
                     <div>
@@ -176,15 +199,16 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-user-tag me-2"></i>Role</label>
-                            <select name="role" class="form-input">
+                            <select name="role" id="userRoleSelect" class="form-input">
                                 <option value="CUSTOMER">Customer</option>
                                 <option value="WAITER">Waiter</option>
-                                <option value="KITCHEN">Kitchen Staff</option>
+                                <option value="KITCHEN">Kitchen</option>
                                 <option value="ADMIN">Admin</option>
                             </select>
                         </div>
-                        <div class="form-group d-flex align-items-end">
-                            <button type="submit" class="btn-primary-gradient w-100 mb-1">Add User</button>
+                        <div class="form-group">
+                            <label class="invisible"><i class="fas fa-user me-2"></i>Action</label>
+                            <button type="submit" class="btn-primary-gradient w-100">Add User</button>
                         </div>
                     </div>
                 </form>
@@ -216,14 +240,76 @@
                 </div>
             </div>
 
+            <div class="content-card mt-4" id="categories">
+                <div class="card-header-flex">
+                    <h3><i class="fas fa-layer-group me-2"></i>Menu Categories</h3>
+                    <button class="btn-primary-gradient" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                        <i class="fas fa-plus me-2"></i>Add Category
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="c : ${allCategories}">
+                                <td th:text="${c.id}"></td>
+                                <td th:text="${c.name}"></td>
+                                <td>
+                                    <a th:href="@{'/admin/delete-category/' + ${c.id}}" class="btn-action btn-delete" onclick="return confirm('Delete this category?');"><i class="fas fa-trash-alt"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="content-card mt-4" id="feedback">
+                <div class="card-header-flex">
+                    <h3><i class="fas fa-star text-warning me-2"></i>Customer Feedback</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Customer</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedbackTableBody">
+                            <tr th:each="fb : ${allFeedbacks}">
+                                <td th:text="${#temporals.format(fb.createdAt, 'dd-MM-yyyy HH:mm')}"></td>
+                                <td class="fw-bold" th:text="${fb.customerName}"></td>
+                                <td>
+                                    <span th:each="star : ${#numbers.sequence(1, 5)}" 
+                                          th:class="${star <= fb.rating ? 'fas fa-star text-warning' : 'far fa-star text-muted'}" 
+                                          style="margin-right: 3px;"></span>
+                                    <small th:text="'(' + ${fb.rating} + '/5)'"></small>
+                                </td>
+                                <td th:text="${fb.comment}" style="max-width:300px; white-space:normal;"></td>
+                                <td>
+                                    <a th:href="@{'/admin/delete-feedback/' + ${fb.id}}" class="btn-action btn-delete" onclick="return confirm('Delete this feedback?');"><i class="fas fa-trash-alt"></i></a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </main>
     </div>
 
-    <!-- Add Food Modal -->
     <div class="modal fade" id="addFoodModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content text-dark">
-          <form th:action="@{/admin/create-food}" method="post">
+          <form id="addFoodForm" th:action="@{/admin/create-food}" method="post" autocomplete="off">
               <div class="modal-header">
                 <h5 class="modal-title">Add Food Item</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -231,11 +317,13 @@
               <div class="modal-body">
                 <div class="mb-3">
                     <label>Name</label>
-                    <input type="text" name="name" class="form-control" required>
+                    <input type="text" name="name" class="form-control" autocomplete="off" required>
                 </div>
                 <div class="mb-3">
-                    <label>Category (e.g. Starters, Main, Drinks)</label>
-                    <input type="text" name="category" class="form-control" required>
+                    <label>Category</label>
+                    <select name="category" class="form-control" required>
+                        <option th:each="cat : ${allCategories}" th:value="${cat.name}" th:text="${cat.name}"></option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label>Price (₹)</label>
@@ -262,7 +350,6 @@
       </div>
     </div>
 
-    <!-- Edit Food Modal -->
     <div class="modal fade" id="editFoodModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content text-dark">
@@ -279,7 +366,9 @@
                 </div>
                 <div class="mb-3">
                     <label>Category</label>
-                    <input type="text" name="category" id="editFoodCategory" class="form-control" required>
+                    <select name="category" id="editFoodCategory" class="form-control" required>
+                        <option th:each="cat : ${allCategories}" th:value="${cat.name}" th:text="${cat.name}"></option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label>Price (₹)</label>
@@ -305,27 +394,210 @@
         </div>
       </div>
     </div>
+    
+    <div class="modal fade" id="addCategoryModal" tabindex="-1">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content text-dark">
+          <form th:action="@{/admin/create-category}" method="post">
+              <div class="modal-header">
+                <h5 class="modal-title">Add Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body">
+                <div class="mb-3">
+                    <label>Category Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="e.g. Desserts" required>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-primary w-100">Save Category</button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                document.querySelectorAll('.sidebar-nav .nav-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+        let searchTimeout = null;
 
-        document.querySelectorAll('.edit-food-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.getElementById('editFoodId').value = this.dataset.id;
-                document.getElementById('editFoodName').value = this.dataset.name;
-                document.getElementById('editFoodCategory').value = this.dataset.category;
-                document.getElementById('editFoodPrice').value = this.dataset.price;
-                document.getElementById('editFoodImageUrl').value = this.dataset.image;
-                document.getElementById('editFoodVeg').checked = this.dataset.veg === 'true';
-                document.getElementById('editFoodAvailable').checked = this.dataset.available === 'true';
-                new bootstrap.Modal(document.getElementById('editFoodModal')).show();
+        function bindAjax() {
+            document.querySelectorAll('form').forEach(form => {
+                form.onsubmit = function(e) {
+                    e.preventDefault();
+                    
+                    // Prevent duplicate submissions
+                    if (this.dataset.submitting === '1') return;
+                    this.dataset.submitting = '1';
+                    
+                    let url = this.getAttribute('action');
+                    let method = this.getAttribute('method') || 'POST';
+                    let options = { method: method };
+
+                    if (method.toLowerCase() === 'post') {
+                        options.body = new FormData(this);
+                    }
+
+                    const modalEl = this.closest('.modal');
+                    if (modalEl) {
+                        const inst = bootstrap.Modal.getInstance(modalEl);
+                        if (inst) inst.hide();
+                    }
+                    
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style = '';
+
+                    fetch(url, options)
+                    .then(res => res.text())
+                    .then(html => {
+                        const doc = new DOMParser().parseFromString(html, 'text/html');
+                        document.querySelector('main.dashboard-content').innerHTML = doc.querySelector('main.dashboard-content').innerHTML;
+                        
+                        if(doc.getElementById('addFoodModal')) document.getElementById('addFoodModal').innerHTML = doc.getElementById('addFoodModal').innerHTML;
+                        if(doc.getElementById('editFoodModal')) document.getElementById('editFoodModal').innerHTML = doc.getElementById('editFoodModal').innerHTML;
+
+                        bindAjax();
+                    })
+                    .catch(err => {
+                        console.error('Submission error:', err);
+                        this.dataset.submitting = '0';
+                    });
+                    
+                    // Reset submit lock after completion
+                    this.dataset.submitting = '0';
+                };
             });
+
+            const searchInput = document.getElementById('liveMenuSearch');
+            if (searchInput) {
+                const newSearchInput = searchInput.cloneNode(true);
+                searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+
+                newSearchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    const query = this.value;
+                    
+                    searchTimeout = setTimeout(() => {
+                        const url = query ? `/admin/dashboard?menuSearch=${encodeURIComponent(query)}` : '/admin/dashboard';
+                        
+                        fetch(url)
+                        .then(res => res.text())
+                        .then(html => {
+                            const doc = new DOMParser().parseFromString(html, 'text/html');
+                            const newBody = doc.getElementById('menuTableBody');
+                            const currentBody = document.getElementById('menuTableBody');
+                            
+                            if (newBody && currentBody) {
+                                currentBody.innerHTML = newBody.innerHTML;
+                                bindTableActions();
+                            }
+                        });
+                    }, 150); 
+                });
+                
+                newSearchInput.focus();
+                newSearchInput.setSelectionRange(newSearchInput.value.length, newSearchInput.value.length);
+            }
+
+            bindTableActions();
+        }
+
+        function bindTableActions() {
+            document.querySelectorAll('.edit-food-btn').forEach(btn => {
+                btn.onclick = function() {
+                    document.getElementById('editFoodId').value = this.getAttribute('data-id');
+                    document.getElementById('editFoodName').value = this.getAttribute('data-name');
+                    document.getElementById('editFoodCategory').value = this.getAttribute('data-category');
+                    document.getElementById('editFoodPrice').value = this.getAttribute('data-price');
+                    document.getElementById('editFoodImageUrl').value = this.getAttribute('data-image');
+                    document.getElementById('editFoodVeg').checked = this.getAttribute('data-veg') === 'true';
+                    document.getElementById('editFoodAvailable').checked = this.getAttribute('data-available') === 'true';
+                    
+                    const editModalElement = document.getElementById('editFoodModal');
+                    let editModal = bootstrap.Modal.getInstance(editModalElement);
+                    if (!editModal) editModal = new bootstrap.Modal(editModalElement);
+                    editModal.show();
+                };
+            });
+
+            document.querySelectorAll('a.btn-delete').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.preventDefault();
+                    if(!confirm('Are you sure you want to perform this deletion?')) return;
+                    
+                    fetch(this.getAttribute('href'))
+                    .then(res => res.text())
+                    .then(html => {
+                        const doc = new DOMParser().parseFromString(html, 'text/html');
+                        document.querySelector('main.dashboard-content').innerHTML = doc.querySelector('main.dashboard-content').innerHTML;
+
+                        if (doc.getElementById('addFoodModal')) {
+                            document.getElementById('addFoodModal').innerHTML = doc.getElementById('addFoodModal').innerHTML;
+                        }
+                        if (doc.getElementById('editFoodModal')) {
+                            document.getElementById('editFoodModal').innerHTML = doc.getElementById('editFoodModal').innerHTML;
+                        }
+
+                        bindAjax();
+                    });
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if ('scrollRestoration' in history) {
+                history.scrollRestoration = 'manual';
+            }
+            if (window.location.hash) {
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+            }
+            const dashboardSection = document.getElementById('dashboard');
+            if (dashboardSection) {
+                dashboardSection.scrollIntoView({ behavior: 'auto', block: 'start' });
+            } else {
+                window.scrollTo(0, 0);
+            }
+            window.addEventListener('load', function() {
+                const dashboardOnLoad = document.getElementById('dashboard');
+                if (dashboardOnLoad) {
+                    dashboardOnLoad.scrollIntoView({ behavior: 'auto', block: 'start' });
+                } else {
+                    window.scrollTo(0, 0);
+                }
+            });
+            bindAjax();
+            document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    document.querySelectorAll('.sidebar-nav .nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            const addFoodModal = document.getElementById('addFoodModal');
+            if (addFoodModal) {
+                addFoodModal.addEventListener('shown.bs.modal', function() {
+                    const form = document.getElementById('addFoodForm');
+                    if (form) form.reset();
+                });
+            }
+
+            // Auto-refresh feedback every 3 seconds
+            setInterval(function() {
+                fetch('/admin/get-feedbacks')
+                .then(res => res.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newTbody = doc.querySelector('tbody#feedbackTableBody');
+                    const currentTbody = document.getElementById('feedbackTableBody');
+                    if (newTbody && currentTbody) {
+                        currentTbody.innerHTML = newTbody.innerHTML;
+                        bindTableActions();
+                    }
+                })
+                .catch(err => console.error('Feedback refresh error:', err));
+            }, 3000);
         });
     </script>
 </body>

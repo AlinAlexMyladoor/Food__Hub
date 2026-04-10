@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +31,57 @@ public class ApiController {
     @Autowired
     private WaiterCallRepository waiterCallRepository;
 
-    @GetMapping("/food-items")
-    public List<FoodItem> getAvailableFoodItems() {
-        return foodItemRepository.findAll();
+    @Autowired
+    private com.foodhub.repository.FeedbackRepository feedbackRepository;
+
+    @Autowired
+    private com.foodhub.repository.CategoryRepository categoryRepository;
+
+@GetMapping("/categories")
+    public List<com.foodhub.model.Category> getAllCategories() {
+        return categoryRepository.findAll();
+    }
+
+@GetMapping("/food-items")
+public List<FoodItem> getAvailableFoodItems() {
+    // Adding a timestamp or ensuring no-cache helps reflection
+    return foodItemRepository.findAllByOrderByNameAsc()
+            .stream()
+            .collect(java.util.stream.Collectors.toMap(
+                    f -> f.getName() == null ? "" : f.getName().trim().toLowerCase(),
+                    f -> f,
+                    (first, second) -> first,
+                    LinkedHashMap::new
+            ))
+            .values()
+            .stream()
+            .toList();
+}
+
+    @PostMapping("/feedback/submit")
+    public ResponseEntity<?> submitFeedback(@RequestBody com.foodhub.model.Feedback feedback) {
+        try {
+            if (feedback.getCreatedAt() == null) {
+                feedback.setCreatedAt(java.time.LocalDateTime.now());
+            }
+            if (feedback.getRating() < 1 || feedback.getRating() > 5) {
+                feedback.setRating(5);
+            }
+            com.foodhub.model.Feedback saved = feedbackRepository.save(feedback);
+            System.out.println("Feedback saved: " + saved.getId() + " - " + saved.getCustomerName() + " - Rating: " + saved.getRating());
+            return ResponseEntity.ok(Map.of("success", true, "message", "Thank you for your feedback!", "id", saved.getId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body(Map.of("success", false, "message", "Error saving feedback: " + e.getMessage()));
+        }
+    }
+
+    @GetMapping("/feedback/latest")
+    public List<com.foodhub.model.Feedback> getLatestFeedbacks() {
+        List<com.foodhub.model.Feedback> feedbacks = feedbackRepository.findAllByOrderByCreatedAtDesc();
+        System.out.println("Fetching feedbacks. Count: " + feedbacks.size());
+        feedbacks.forEach(fb -> System.out.println("- " + fb.getCustomerName() + ": " + fb.getRating() + " stars"));
+        return feedbacks;
     }
 
     @PostMapping("/orders")

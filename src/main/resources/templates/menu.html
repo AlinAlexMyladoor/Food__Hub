@@ -81,6 +81,8 @@
         .btn-call-waiter { border: 1px solid #ffdca8; background: #fffdf5; color: #f59f00; font-weight: bold; border-radius: 12px; height: 50px; padding: 0 15px; display: flex; align-items: center; transition: 0.3s; animation: pulse-waiter 2s infinite; }
         .btn-call-waiter:hover { background: #f59f00; color: white !important; }
 
+        .rate-us-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: all 0.2s ease; }
+
         @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(217, 4, 41, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(217, 4, 41, 0); } 100% { box-shadow: 0 0 0 0 rgba(217, 4, 41, 0); } }
     </style>
 </head>
@@ -123,6 +125,9 @@
                 </button>
                 <button class="btn-call-waiter ms-2 shadow-sm" id="assistanceBtn" onclick="callWaiter()" title="Call Waiter for Assistance">
                     <i class="fas fa-bell fs-5 me-2"></i> Need Help?
+                </button>
+                <button class="btn ms-2 shadow-sm fw-bold border rate-us-btn" style="background:#fff3cd; color:#856404; border-radius:12px; height:50px; padding:0 20px;" onclick="openFeedbackModal()">
+                    <i class="fas fa-star text-warning me-2"></i>Rate Us
                 </button>
                 <div class="table-selector ms-3 me-2">
                     <button class="table-badge no-table" id="tableToggle" onclick="tableModalInst.show()" type="button">
@@ -222,6 +227,45 @@
     </div>
 
     <!-- Professional Table Selection Modal -->
+    <!-- Feedback Modal -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="modal-header border-0 bg-warning text-dark px-4 py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title fw-bolder fs-4"><i class="fas fa-star text-dark me-2"></i>Rate & Review</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 bg-light">
+                    
+                    <h6 class="fw-bold mb-3 text-secondary">Leave a Review</h6>
+                    <div class="card border-0 shadow-sm rounded-3 p-3 mb-4">
+                        <input type="text" id="fbName" class="form-control mb-2" placeholder="Your Name (Optional)">
+                        <div class="mb-2">
+                            <label class="form-label">Rating</label>
+                            <div class="star-rating" id="starRating">
+                                <i class="far fa-star" data-value="1" style="font-size: 1.8rem; color: #ddd; cursor: pointer; margin-right: 5px;"></i>
+                                <i class="far fa-star" data-value="2" style="font-size: 1.8rem; color: #ddd; cursor: pointer; margin-right: 5px;"></i>
+                                <i class="far fa-star" data-value="3" style="font-size: 1.8rem; color: #ddd; cursor: pointer; margin-right: 5px;"></i>
+                                <i class="far fa-star" data-value="4" style="font-size: 1.8rem; color: #ddd; cursor: pointer; margin-right: 5px;"></i>
+                                <i class="far fa-star" data-value="5" style="font-size: 1.8rem; color: #ddd; cursor: pointer; margin-right: 5px;"></i>
+                            </div>
+                            <input type="hidden" id="fbRating" value="0" required>
+                        </div>
+                        <textarea id="fbComment" class="form-control mb-2" placeholder="Tell us about your experience..." rows="2"></textarea>
+                        <div class="d-flex gap-2">
+                            <button class="btn w-100 fw-bold shadow-sm text-dark" style="background-color: #ffc107; border:none;" onclick="submitFeedback()">Submit Feedback <i class="fas fa-paper-plane ms-1"></i></button>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-3 text-secondary">Recent Reviews</h6>
+                    <div id="feedbackList" class="d-flex flex-column gap-3 pe-1" style="max-height: 250px; overflow-y:auto;">
+                        <!-- JS Injected -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="tableSelectModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
@@ -323,7 +367,7 @@
                 <i class="fas fa-star" onclick="setRating(5)"></i>
             </div>
             <textarea class="form-control mb-4" rows="3" placeholder="Tell us what you loved..." style="border-radius:12px;"></textarea>
-            <button class="btn btn-success btn-lg w-100 rounded-pill fw-bold shadow-sm" onclick="submitFeedback()">Submit Review</button>
+            <button class="btn btn-success btn-lg w-100 rounded-pill fw-bold shadow-sm" onclick="submitOrderFeedback()">Submit Review</button>
           </div>
         </div>
       </div>
@@ -366,17 +410,17 @@
         }
 
         function fetchFoodItems() {
-            fetch('/api/food-items')
-                .then(r => r.json())
-                .then(data => {
-                    allFoodItems = data;
-                    renderFoodGrid('all');
-                })
-                .catch(e => {
-                    document.getElementById('foodGrid').innerHTML = '<p class="text-danger">Failed to load menu items.</p>';
-                });
-        }
-
+    // Adding a timestamp (?t=...) prevents the browser from loading a cached version
+    fetch('/api/food-items?t=' + new Date().getTime())
+        .then(r => r.json())
+        .then(data => {
+            allFoodItems = data;
+            renderFoodGrid('all');
+        })
+        .catch(e => {
+            document.getElementById('foodGrid').innerHTML = '<p class="text-danger">Failed to load menu items.</p>';
+        });
+}
         function renderCategories() {
             let html = '';
             fixedCategories.forEach(cat => {
@@ -646,7 +690,124 @@
             setTimeout(() => {
                 notification.classList.remove('show');
                 setTimeout(() => notification.remove(), 300);
-            }, 2500);
+            }, 3000);
+        }
+
+        
+        function openFeedbackModal() {
+            if(!feedbackModalInst) {
+                feedbackModalInst = new bootstrap.Modal(document.getElementById('feedbackModal'));
+            }
+            fetchFeedbacks();
+            feedbackModalInst.show();
+        }
+
+        function fetchFeedbacks() {
+            fetch('/api/feedback/latest')
+            .then(res => res.json())
+            .then(data => {
+                console.log('Feedbacks fetched:', data);
+                const list = document.getElementById('feedbackList');
+                if(!data || data.length === 0) {
+                    list.innerHTML = '<div class="text-center text-muted p-3">No reviews yet. Be the first!</div>';
+                    return;
+                }
+                list.innerHTML = data.map(fb => `
+                    <div class="card border-0 shadow-sm p-3 rounded-3" style="border-left: 4px solid #ffc107 !important;">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-dark">${fb.customerName || 'Anonymous'}</span>
+                            <span class="text-warning">${'★'.repeat(fb.rating)}${'☆'.repeat(5-fb.rating)}</span>
+                        </div>
+                        <div class="text-muted small">${fb.comment || ''}</div>
+                        <div class="d-flex justify-content-end mt-1">
+                            <small class="text-muted">${fb.createdAt ? new Date(fb.createdAt).toLocaleString() : ''}</small>
+                        </div>
+                    </div>
+                `).join('');
+            })
+            .catch(err => {
+                console.error('Fetch error:', err);
+                document.getElementById('feedbackList').innerHTML = '<div class="text-center text-danger">Error loading reviews</div>';
+            });
+        }
+
+        // Star rating click handler
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchFeedbacks();  // Load existing feedback on page load
+            
+            const stars = document.querySelectorAll('#starRating i');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    document.getElementById('fbRating').value = value;
+                    stars.forEach((s, idx) => {
+                        if (idx < value) {
+                            s.classList.remove('far');
+                            s.classList.add('fas');
+                            s.style.color = '#FFD700';
+                        } else {
+                            s.classList.remove('fas');
+                            s.classList.add('far');
+                            s.style.color = '#ddd';
+                        }
+                    });
+                });
+                star.addEventListener('mouseover', function() {
+                    const value = this.getAttribute('data-value');
+                    stars.forEach((s, idx) => {
+                        if (idx < value) {
+                            s.style.color = '#FFD700';
+                        } else {
+                            s.style.color = '#ddd';
+                        }
+                    });
+                });
+            });
+        });
+
+        function testFeedback() {
+            console.log('Test: posting feedback...');
+            fetch('/api/feedback/submit', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({customerName: 'TEST', rating: 5, comment: 'Test'})
+            })
+            .then(r => r.json()).then(d => { console.log('Test OK:', d); setTimeout(fetchFeedbacks, 500); })
+            .catch(e => console.error('Test failed:', e));
+        }
+
+        function submitFeedback() {
+            const name = document.getElementById('fbName').value || 'Anonymous';
+            const rating = parseInt(document.getElementById('fbRating').value);
+            const comment = document.getElementById('fbComment').value;
+
+            console.log('Submitting:', {name, rating, comment});
+
+            if (rating === 0 || rating === '0') {
+                showNotification("Please select a rating!");
+                return;
+            }
+
+            fetch('/api/feedback/submit', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ customerName: name, rating: rating, comment: comment })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Feedback saved:', data);
+                showNotification('Thank you for your feedback!');
+                document.getElementById('fbName').value = '';
+                document.getElementById('fbRating').value = '0';
+                document.getElementById('fbComment').value = '';
+                document.querySelectorAll('#starRating i').forEach(s => {
+                    s.classList.remove('fas');
+                    s.classList.add('far');
+                    s.style.color = '#ddd';
+                });
+                setTimeout(fetchFeedbacks, 500);
+            })
+            .catch(err => console.error('Submit error:', err));
         }
 
         function proceedToPayment() {
@@ -920,7 +1081,7 @@
             });
         }
 
-        function submitFeedback() {
+        function submitOrderFeedback() {
             if(feedbackModalInst) feedbackModalInst.hide();
             showNotification(`Thank you for your rating! ❤️`);
             
@@ -931,6 +1092,32 @@
 
             renderOrdersUI();
         }
+
+        // Auto-refresh categories every 5 seconds
+        setInterval(function() {
+            fetch('/api/categories')
+                .then(res => res.json())
+                .then(categories => {
+                    const wrapper = document.querySelector('.vertical-categories');
+                    if (!wrapper) return;
+                    
+                    const currentActive = wrapper.querySelector('.category-pill.active');
+                    const activeName = currentActive ? currentActive.getAttribute('data-category') : 'all';
+                    
+                    let html = '';
+                    const fixedCats = [{id: 'all', name: 'All Items', icon: 'fa-th-large'}];
+                    const dynamicCats = categories.map(cat => ({id: cat.name.toLowerCase(), name: cat.name, icon: 'fa-layer-group'}));
+                    [...fixedCats, ...dynamicCats].forEach(cat => {
+                        html += `
+                            <button class="category-pill ${cat.id === activeName ? 'active' : ''}" data-category="${cat.id}" data-name="${cat.name}" onclick="filterCategory('${cat.id}')">
+                                <i class="fas ${cat.icon} fa-fw"></i>
+                                <span>${cat.name}</span>
+                            </button>
+                        `;
+                    });
+                    wrapper.innerHTML = html;
+                });
+        }, 5000);
 
         function printReceipt(id) {
             const order = activeOrders.find(o => o.id === id);

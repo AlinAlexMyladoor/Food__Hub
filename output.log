@@ -2549,3 +2549,9 @@ Hibernate: select o1_0.id,o1_0.created_at,o1_0.customer_username,o1_0.status,o1_
 Hibernate: select o1_0.id,o1_0.created_at,o1_0.customer_username,o1_0.status,o1_0.table_number,o1_0.total_amount from orders o1_0
 Hibernate: select count(*) from orders o1_0
 Hibernate: select count(*) from users u1_0
+2026-04-09T04:03:04.944+05:30  WARN 39798 --- [l-5:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-5 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@af542bd (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
+2026-04-09T04:03:15.503+05:30  INFO 39798 --- [ionShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-04-09T04:03:15.507+05:30  INFO 39798 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-04-09T04:03:15.514+05:30  INFO 39798 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-04-09T04:03:15.515+05:30  INFO 39798 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Shutdown initiated...
+2026-04-09T04:03:20.172+05:30  INFO 39798 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-5 - Shutdown completed.

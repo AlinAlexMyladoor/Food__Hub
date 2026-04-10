@@ -18,11 +18,13 @@ public class FoodHubApplication {
     @Bean
 CommandLineRunner initFoodDatabase(FoodRepository repository) {
     return args -> {
-        FoodItem f1 = new FoodItem();
-        f1.setName("Margherita Pizza");
-        f1.setCategory("Main");
-        f1.setPrice(12.99);
-        repository.save(f1);
+        if (!repository.existsByNameIgnoreCase("Margherita Pizza")) {
+            FoodItem f1 = new FoodItem();
+            f1.setName("Margherita Pizza");
+            f1.setCategory("Main");
+            f1.setPrice(12.99);
+            repository.save(f1);
+        }
     };
 }
     

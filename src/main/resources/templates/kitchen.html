@@ -18,23 +18,40 @@
             <div class="time-badge"><i class="far fa-clock me-2"></i><span id="currentTime"></span></div>
         </div>
         <div class="header-right">
-            <a th:href="@{/logout}" class="btn-logout-inline"><i class="fas fa-sign-out-alt"></i></a>
+            <a th:href="@{/logout}" class="btn btn-outline-danger fw-bold shadow-sm px-4 rounded-pill border-2" style="background:#fff;"><i class="fas fa-sign-out-alt me-2"></i> Logout</a>
         </div>
     </header>
 
-    <main class="kitchen-container" id="kanban-board">
-        <section class="order-column">
-            <div class="column-header column-pending">
-                <i class="fas fa-clock"></i>
-                <h3>New Orders (PLACED)</h3>
+    <div class="container mt-4 mb-2">
+        <div class="row text-center d-flex justify-content-center gap-4">
+            <div class="col-md-3 p-3 bg-white shadow-sm rounded-3 border-bottom border-primary border-4">
+                <h5 class="text-muted fw-bold mb-1">Pending Orders</h5>
+                <h2 class="m-0 text-primary fw-bold" id="metricPlaced">0</h2>
+            </div>
+            <div class="col-md-3 p-3 bg-white shadow-sm rounded-3 border-bottom border-warning border-4">
+                <h5 class="text-muted fw-bold mb-1">Currently Cooking</h5>
+                <h2 class="m-0 text-warning fw-bold" id="metricCooking">0</h2>
+            </div>
+        </div>
+    </div>
+
+    <main class="container d-flex justify-content-center align-items-start mt-4 gap-5" id="kanban-board" style="max-width: 1200px;">
+        <section class="order-column w-50" style="min-width: 450px; max-width: 550px;">
+            <div class="p-3 bg-white rounded-3 shadow-sm border-start border-primary border-5 d-flex align-items-center mb-4">
+                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width:45px; height:45px;">
+                    <i class="fas fa-clock fs-5"></i>
+                </div>
+                <h3 class="m-0 fw-bold text-dark fs-4">New Orders</h3>
             </div>
             <div class="orders-list" id="placedList"></div>
         </section>
 
-        <section class="order-column">
-            <div class="column-header column-preparing">
-                <i class="fas fa-fire"></i>
-                <h3>Preparing (COOKING)</h3>
+        <section class="order-column w-50" style="min-width: 450px; max-width: 550px;">
+            <div class="p-3 bg-white rounded-3 shadow-sm border-start border-warning border-5 d-flex align-items-center mb-4">
+                <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width:45px; height:45px;">
+                    <i class="fas fa-fire fs-5"></i>
+                </div>
+                <h3 class="m-0 fw-bold text-dark fs-4">Cooking</h3>
             </div>
             <div class="orders-list" id="cookingList"></div>
         </section>
@@ -62,6 +79,9 @@
             const placed = orders.filter(o => o.status === 'PLACED');
             const cooking = orders.filter(o => o.status === 'COOKING');
 
+            document.getElementById('metricPlaced').innerText = placed.length;
+            document.getElementById('metricCooking').innerText = cooking.length;
+
             const newPlaced = placed.map(o => buildCard(o, 'COOKING', 'Start Preparing', 'fas fa-play')).join('');
             if (lastPlaced !== newPlaced) {
                 document.getElementById('placedList').innerHTML = newPlaced;
@@ -76,27 +96,34 @@
         }
 
         function buildCard(order, nextStatus, btnText, btnIcon) {
+            const isCooking = nextStatus !== 'COOKING';
+            const colorClass = isCooking ? 'warning' : 'primary';
+            const statusBorder = isCooking ? '#ffc107' : '#0d6efd';
+            
             let itemsHtml = order.items.map(i => `
-                <div class="order-item" style="display:flex; flex-direction:column;">
-                    <div style="display:flex; justify-content:space-between;">
-                        <span class="item-qty">${i.quantity}x</span>
-                        <span class="item-name">${i.foodItem.name}</span>
+                <div class="d-flex flex-column mb-2 pb-2 border-bottom border-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark"><span class="badge bg-secondary me-2">${i.quantity}x</span>${i.foodItem.name}</span>
                     </div>
-                    ${i.specialInstructions ? `<div class="badge bg-warning text-dark mt-1 text-wrap text-start" style="font-size:0.75rem;"><i class="fas fa-exclamation-triangle"></i> Note: ${i.specialInstructions}</div>` : ''}
+                    ${i.specialInstructions ? `<div class="badge bg-danger text-white mt-2 text-wrap text-start fs-6"><i class="fas fa-exclamation-triangle me-1"></i> ${i.specialInstructions}</div>` : ''}
                 </div>
             `).join('');
             
             return `
-            <article class="order-card order-new">
-                <div class="order-header">
-                    <div class="order-number">#${order.id}</div>
+            <article class="order-card shadow-sm mb-3" style="background: #fdfdfd; border-left: 4px solid ${statusBorder}; border-radius: 8px; padding: 15px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="order-number text-${colorClass} fw-bold fs-5">
+                        <i class="fas fa-hashtag me-1"></i> Order #${order.id}
+                    </div>
+                    <span class="badge bg-secondary rounded-pill px-3 py-2 fs-6">
+                        <i class="fas fa-chair me-1"></i> Table ${order.tableNumber}
+                    </span>
                 </div>
-                <div class="order-items">${itemsHtml}</div>
-                <div class="order-meta">
-                    <span class="table-info"><i class="fas fa-chair"></i> Table ${order.tableNumber}</span>
+                <div class="order-items bg-white border rounded p-2 shadow-sm mb-3" style="max-height: 250px; overflow-y: auto;">
+                    ${itemsHtml}
                 </div>
-                <button class="btn-order-action btn-start" onclick="updateStatus(${order.id}, '${nextStatus}')">
-                    <i class="${btnIcon}"></i> ${btnText}
+                <button class="btn btn-outline-${colorClass} w-100 fw-bold shadow-sm" onclick="updateStatus(${order.id}, '${nextStatus}')">
+                    <i class="${btnIcon} me-2"></i> ${btnText}
                 </button>
             </article>`;
         }
