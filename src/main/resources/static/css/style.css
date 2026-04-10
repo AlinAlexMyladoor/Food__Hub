@@ -2071,3 +2071,147 @@ body {
     padding-left: 15px !important;
     padding-right: 36px !important;
 }
+
+/* ===================================
+   MOBILE RESPONSIVE ENHANCEMENTS
+   =================================== */
+
+@media (max-width: 768px) {
+    .top-navbar {
+        padding: 14px 16px;
+    }
+
+    .dashboard-content {
+        padding: 16px;
+    }
+
+    .card-header-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .menu-navbar {
+        padding: 12px 14px !important;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .menu-navbar .navbar-brand-section {
+        width: 100%;
+    }
+
+    .menu-navbar .navbar-center {
+        order: 3;
+        width: 100%;
+        display: flex !important;
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 10px;
+    }
+
+    .search-bar-inline {
+        width: 100%;
+        margin-right: 0 !important;
+    }
+
+    .search-bar-inline input {
+        width: 100% !important;
+    }
+
+    .menu-navbar .navbar-actions {
+        order: 2;
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .menu-navbar .navbar-actions > * {
+        margin: 0 !important;
+    }
+
+    .btn-call-waiter,
+    .btn-logout-beautiful,
+    .table-badge {
+        height: 44px !important;
+        border-radius: 12px !important;
+        padding: 0 12px !important;
+    }
+
+    .main-layout {
+        flex-direction: column !important;
+    }
+
+    .category-side-panel {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 16px !important;
+        border-right: none !important;
+        border-bottom: 1px solid #eaeaea;
+    }
+
+    .vertical-categories {
+        flex-direction: row !important;
+        overflow-x: auto;
+        padding-bottom: 6px;
+    }
+
+    .vertical-categories .category-pill {
+        min-width: max-content;
+    }
+
+    .menu-container {
+        padding: 16px !important;
+    }
+
+    .food-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+
+    .orders-sidebar,
+    .cart-sidebar {
+        width: 100% !important;
+        right: -100% !important;
+    }
+
+    .orders-sidebar.active,
+    .cart-sidebar.active {
+        right: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-gradient {
+        font-size: 1.2rem;
+    }
+
+    #heroCarousel h1 {
+        font-size: 1.6rem !important;
+        line-height: 1.2 !important;
+    }
+
+    #heroCarousel p {
+        font-size: 0.95rem !important;
+    }
+
+    .cart-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .notification-toast {
+        left: 10px;
+        right: 10px;
+        top: 12px;
+    }
+
+    .notification-toast.show {
+        right: 10px;
+    }
+}
